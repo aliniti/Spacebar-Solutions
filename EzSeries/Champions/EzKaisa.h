@@ -5,7 +5,6 @@
 
 class EzKaisa {
   public:
-
     static float kaisa_ult_range();
     static std::map<std::string, std::shared_ptr<ISpell>> spells;
     static std::map<std::string, IMenuElement *> elements;
@@ -28,7 +27,6 @@ class EzKaisa {
 
 std::map<std::string, std::shared_ptr<ISpell>> EzKaisa::spells = {};
 std::map<std::string, IMenuElement *> EzKaisa::elements = {};
-
 
 inline auto EzKaisa::kaisa_ult_range() -> float {
     return std::vector<int> {1500, 2000, 2500} [spells["r"]->Level() - 1];

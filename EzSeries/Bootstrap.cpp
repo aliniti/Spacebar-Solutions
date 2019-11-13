@@ -9,7 +9,6 @@
 PLUGIN_API const char PLUGIN_PRINT_NAME[32] = "EzSeries";
 PLUGIN_API const char PLUGIN_PRINT_AUTHOR[32] = "Kurisu";
 PLUGIN_API ChampionId PLUGIN_TARGET_CHAMP = ChampionId::Unknown;
-
 IMenu * Config = {};
 
 auto on_delete(IGameObject * unit) -> void {
