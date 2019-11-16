@@ -86,6 +86,8 @@ auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Jinx: return EzJinx::on_do_cast(unit, args);
 
+        case ChampionId::Vayne: return EzVayne::on_do_cast(unit, args);
+
         default: ; } }
 
 auto build_menu(IMenu * menu) -> IMenu * {
