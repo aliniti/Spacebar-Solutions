@@ -6,12 +6,10 @@ enum class ScenarioType {
     Solo,
     Overkill,
     ImSoFuckingDead,
-    Chilling
-};
+    Chilling };
 
 enum class ManaScenario {
     NoJuice = 0,
     Low,
     Medium,
-    High
-};
+    High };
