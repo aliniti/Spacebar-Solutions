@@ -5,6 +5,15 @@
 
 class EzExtensions {
     public:
+
+        static auto to_2d(Vector p) -> Vector2;
+        static auto to_3d(Vector2 p) -> Vector;
+        static auto perpendicular(Vector2 v) -> Vector2;
+
+        static auto dist_2d(Vector from, Vector to) -> float;
+        static auto dist_2d(Vector2 from, Vector2 to) -> float;
+        static auto dist_2d(Vector2 from, Vector to) -> float;
+
         static auto get_in_range(IGameObject * unit, float range, EntityType type, std::vector<IGameObject *> & units) -> int;
         static auto is_ready(std::shared_ptr<ISpell> spell, float time) -> bool;
         static auto get_prediction(std::shared_ptr<ISpell> spell, IGameObject * unit) -> IPredictionOutput;
@@ -13,9 +22,29 @@ class EzExtensions {
         static auto get_prefered_hitchance(IGameObject * unit) -> HitChance;
         static std::vector<IGameObject *> get_units_in_range(IGameObject * source, EntityType type, float range, bool enemies);
         static int get_in_range(IGameObject * source, EntityType type, float range, bool enemies);
-        static auto check_path(Vector start, Vector end, float width, float range, std::vector<IGameObject *> & units, bool minion) -> int;
+        static auto project_on_path(Vector start, Vector end, float width, float range, std::vector<IGameObject *> & units, bool minion) -> int;
+
         static auto draw_dmg_hpbar(IGameObject * unit, double damage, const char * text, DWORD color) -> void;
         static auto is_plant(IGameObject * unit) -> bool; };
+
+
+inline Vector2 EzExtensions::to_2d(Vector p) {
+    return Vector2(p.x, p.z); }
+
+inline Vector EzExtensions::to_3d(Vector2 p) {
+    return Vector(p.x, 0, p.y); }
+
+inline Vector2 EzExtensions::perpendicular(Vector2 v) {
+    return Vector2(-v.y, v.x); }
+
+inline auto EzExtensions::dist_2d(Vector from, Vector to) -> float {
+    return (from - to).Length(); }
+
+inline auto EzExtensions::dist_2d(Vector2 from, Vector2 to) -> float {
+    return (to_3d(from) - to_3d(to)).Length(); }
+
+inline auto EzExtensions::dist_2d(Vector2 from, Vector to) -> float {
+    return (to_3d(from) - to).Length(); }
 
 inline auto EzExtensions::get_in_range(IGameObject * unit, float range, EntityType type, std::vector<IGameObject *> & units) -> int {
     std::vector<IGameObject *> mip;
@@ -122,7 +151,7 @@ inline auto EzExtensions::get_in_range(IGameObject * source, EntityType type, fl
         return u != nullptr && u->IsValidTarget(); });
     return valid_units; }
 
-inline auto EzExtensions::check_path(Vector start, Vector end, float width, float range, std::vector<IGameObject *> & units, bool minion) -> int {
+inline auto EzExtensions::project_on_path(Vector start, Vector end, float width, float range, std::vector<IGameObject *> & units, bool minion) -> int {
     auto direction = (end - start).Normalized();
     auto endposition = start + direction * start.Distance(end);
     auto objs = g_ObjectManager->GetByType(EntityType::Any, [&](IGameObject* u) {
@@ -150,3 +179,4 @@ inline auto EzExtensions::draw_dmg_hpbar(IGameObject * unit, double damage, cons
 
 inline auto EzExtensions::is_plant(IGameObject * unit) -> bool {
     return strstr(unit->Name().c_str(), "Plant"); }
+

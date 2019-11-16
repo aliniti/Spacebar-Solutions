@@ -2,7 +2,7 @@
 #include "SDK/EventHandler.h"
 #include "Champions/EzTristana.h"
 #include "Champions/EzJinx.h"
-#include "Champions/EzVayne.h"
+#include "Champions/EzCamille.h"
 // oh dis...
 PLUGIN_API const char PLUGIN_PRINT_NAME[32] = "EzSeries";
 PLUGIN_API const char PLUGIN_PRINT_AUTHOR[32] = "Kurisu";
@@ -86,7 +86,7 @@ auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Jinx: return EzJinx::on_do_cast(unit, args);
 
-        case ChampionId::Vayne: return EzVayne::on_do_cast(unit, args);
+        case ChampionId::Vayne: return EzCamille::on_do_cast(unit, args);
 
         default: ; } }
 
@@ -100,7 +100,7 @@ auto build_menu(IMenu * menu) -> IMenu * {
 
         case ChampionId::Jinx: return EzJinx::on_boot(menu);
 
-        case ChampionId::Vayne: return EzVayne::on_load(menu);
+        case ChampionId::Vayne: return EzCamille::on_load(menu);
 
         default: {
                 g_Common->ChatPrint(R"(<font color="#99FF99"><b>[EzSeries]:</b></font><b><font color="#FF3366"> No Support!</font>)"); } } }
