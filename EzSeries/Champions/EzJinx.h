@@ -51,11 +51,13 @@ inline IMenu * EzJinx::on_boot(IMenu * menu) {
     Menu["jinx.draww.r.color"] = d_menu->AddColorPicker("-> Color HpBarDraw", "jinx.draww.r.color", 255, 153, 102, 185);
     auto mechanics_menu = menu->AddSubMenu("Jinx: Mechanics", "jinx.mechanics");
     auto zap_menu = mechanics_menu->AddSubMenu("Zap Settings", "zap.settings");
-    Menu["jinx.use.w.mania"] = zap_menu->AddCheckBox("Block Zap on Mania", "jinx.use.w.mania", true); // harass whitelist..
+    Menu["jinx.use.w.mania"] = zap_menu->AddCheckBox("Block Zap on Mania", "jinx.use.w.mania", true);
 
+    // harass whitelist..
     for(auto i : g_ObjectManager->GetByType(EntityType::AIHeroClient)) {
         if(i->IsEnemy()) {
-            Menu[i->ChampionName().append("block.zapp")] = zap_menu->AddCheckBox("Block Zap on " + i->ChampionName(), i->ChampionName().append("block.zapp"),
+            Menu[i->ChampionName().append("block.zapp")] =
+                zap_menu->AddCheckBox("Block Zap on " + i->ChampionName(), i->ChampionName().append("block.zapp"),
                     false); } }
 
     Menu["jinx.maxx.r.dist"] = mechanics_menu->AddSlider("Max R Distance:", "jinx.maxx.r.dist", 3500, 700, 4500);
@@ -217,13 +219,15 @@ inline void EzJinx::on_update() {
         auto target = g_Common->GetTarget(Menu["jinx.maxx.r.dist"]->GetInt(), DamageType::Physical);
 
         if(target != nullptr && target->IsValidTarget() && Spells["jinx.r"]->IsReady() && Menu["jinx.use.r"]->GetBool()) {
-            const auto pred = Ex->get_prediction(Spells["jinx.r"], target); // for max damage
+            const auto pred = Ex->get_prediction(Spells["jinx.r"], target);
 
+            // for max damage
             if(target->Distance(g_LocalPlayer) > 750) {
                 if(jinx_ult_dmg(target) >= target->RealHealth(true, true)) {
                     if(pred.Hitchance >= HitChance::High) {
-                        Spells["jinx.r"]->FastCast(pred.CastPosition); } } } } } // todo: jinx zap tweaks
+                        Spells["jinx.r"]->FastCast(pred.CastPosition); } } } } }
 
+    // todo: jinx zap tweaks
     if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
         const auto bonus = std::vector<int> {75, 100, 125, 150, 175 } [Spells["jinx.q"]->Level() - 1];
         auto target = g_Common->GetTarget(Spells["jinx.w"]->Range(), DamageType::Physical);
@@ -251,13 +255,14 @@ inline void EzJinx::on_update() {
                 if(Ex->get_combat_scenario(g_LocalPlayer) == ScenarioType::ImSoFuckingDead && !g_LocalPlayer->IsFacing(target)) {
                     Spells["jinx.e"]->FastCast(g_LocalPlayer->ServerPosition()); }
 
-                if(Ex->get_combat_scenario(g_LocalPlayer) == ScenarioType::Solo && !target->IsFacing(g_LocalPlayer)) {
-                    if(target->HealthPercent() < 50 && target->Distance(g_LocalPlayer) <= 420) {
-                        Spells["jinx.e"]->FastCast(pred.CastPosition); } }
+                if(Ex->get_combat_scenario(g_LocalPlayer) == ScenarioType::Solo && target->IsFacing(g_LocalPlayer)) {
+                    if(target->IsMelee() && target->Distance(g_LocalPlayer) <= 325) {
+                        Spells["jinx.e"]->FastCast(g_LocalPlayer->ServerPosition()); } }
 
                 if(Ex->get_combat_scenario(g_LocalPlayer) == ScenarioType::Skirmish) {
-                    if(target->HasBuffOfType(BuffType::Slow) || target->HasBuffOfType(BuffType::Knockup) || target->HasBuffOfType(BuffType::Flee)) {
-                        Spells["jinx.e"]->FastCast(pred.CastPosition); } } } } }
+                    if(target->HasBuffOfType(BuffType::Sleep) || target->HasBuffOfType(BuffType::Knockup) ||
+                        target->HasBuffOfType(BuffType::Flee)) {
+                        Spells["jinx.e"]->FastCast(target->ServerPosition()); } } } } }
 
     handle_rockets();
     on_post_update(); }

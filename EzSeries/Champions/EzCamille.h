@@ -25,12 +25,12 @@ class EzCamille : public EzChampion {
         static auto use_r(IGameObject * unit, bool force) -> void;
 
         // -> damage
-        static bool lethal_target(IGameObject * unit);
-        static double c_dmg(IGameObject * unit);
-        static double q_dmg(IGameObject * unit, bool includeq2 = true);
-        static double w_dmg(IGameObject * unit, bool bonus = false);
-        static double e_dmg(IGameObject * unit);
-        static double r_dmg(double dmg, IGameObject * unit);
+        static auto lethal_target(IGameObject * unit) -> bool;
+        static auto c_dmg(IGameObject * unit) -> double;
+        static auto q_dmg(IGameObject * unit, bool includeq2 = true) -> double;
+        static auto w_dmg(IGameObject * unit, bool bonus = false) -> double;
+        static auto e_dmg(IGameObject * unit) -> double;
+        static auto r_dmg(double dmg, IGameObject * unit) -> double;
 
         // -> event hooks
         static void on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args); };
@@ -237,16 +237,21 @@ inline auto EzCamille::use_e(Vector pos, bool combo) -> void {
 inline auto EzCamille::use_r(IGameObject * unit, bool force) -> void {}
 
 
-inline bool EzCamille::lethal_target(IGameObject * unit) {}
+#pragma endregion
 
-inline double EzCamille::c_dmg(IGameObject * unit) {}
+#pragma region damage
+
+inline auto EzCamille::lethal_target(IGameObject * unit) -> bool {}
+inline auto EzCamille::c_dmg(IGameObject * unit) -> double {}
 inline double EzCamille::q_dmg(IGameObject * unit, bool includeq2) {}
 inline double EzCamille::w_dmg(IGameObject * unit, bool bonus) {}
 inline double EzCamille::e_dmg(IGameObject * unit) {}
 inline double EzCamille::r_dmg(double dmg, IGameObject * unit) {}
 
-
 #pragma endregion
+
+
+
 inline void EzCamille::on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) {
     if(unit->IsMe()) {
         if(args->IsAutoAttack) {
