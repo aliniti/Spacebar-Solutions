@@ -123,6 +123,7 @@
   <ItemGroup>
     <ClInclude Include="Champions\EzChampion.h" />
     <ClInclude Include="Champions\EzJinx.h" />
+    <ClInclude Include="Champions\EzKatarina.h" />
     <ClInclude Include="Champions\EzZed.h" />
     <ClInclude Include="Champions\EzCamille.h" />
     <ClInclude Include="Helpers\EzAvoider.h" />

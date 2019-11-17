@@ -243,24 +243,11 @@ inline auto EzCamille::use_r(IGameObject * unit, bool force) -> void {}
 
 inline auto EzCamille::lethal_target(IGameObject * unit) -> bool {}
 inline auto EzCamille::c_dmg(IGameObject * unit) -> double {}
-inline double EzCamille::q_dmg(IGameObject * unit, bool includeq2) {}
-inline double EzCamille::w_dmg(IGameObject * unit, bool bonus) {}
-inline double EzCamille::e_dmg(IGameObject * unit) {}
-inline double EzCamille::r_dmg(double dmg, IGameObject * unit) {}
+inline auto EzCamille::q_dmg(IGameObject * unit, bool includeq2) -> double {}
+inline auto EzCamille::w_dmg(IGameObject * unit, bool bonus) -> double {}
+inline auto EzCamille::e_dmg(IGameObject * unit) -> double {}
+inline auto EzCamille::r_dmg(double dmg, IGameObject * unit) -> double {}
 
 #pragma endregion
 
-
-
-inline void EzCamille::on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) {
-    if(unit->IsMe()) {
-        if(args->IsAutoAttack) {
-            if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
-                // AA -> E
-                if(Spells["vayne.e"]->IsReady() && args->Target->IsAIHero()) {
-                    if(args->Target->Distance(unit) <= Spells["vayne.e"]->Range()) {
-                        Spells["vayne.e"]->Cast(args->Target); } } // AA -> Q
-
-                if(Spells["vayne.q"]->IsReady()) {
-                    if(Spells["vayne.q"]->Cast(g_Common->CursorPosition())) {
-                        g_Orbwalker->ResetAA(); } } } } } }
+inline void EzCamille::on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) {}
