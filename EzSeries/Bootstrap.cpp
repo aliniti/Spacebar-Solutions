@@ -10,12 +10,12 @@ PLUGIN_API const char PLUGIN_PRINT_AUTHOR[32] = "Kurisu";
 PLUGIN_API ChampionId PLUGIN_TARGET_CHAMP = ChampionId::Unknown;
 IMenu * Config = { };
 
-auto on_new_path(IGameObject * unit, OnNewPathEventArgs * args) {
+auto on_issue_order(IGameObject * unit, OnIssueOrderEventArgs * args) {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
         return; }
 
     switch(g_LocalPlayer->ChampionId()) {
-        case ChampionId::Katarina: return EzKatarina::on_new_path(unit, args);
+        case ChampionId::Katarina: return EzKatarina::on_issue_order(unit, args);
 
         default:; } }
 
@@ -137,16 +137,20 @@ auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
         default: ; } }
 
 auto build_menu(IMenu * menu) -> IMenu * {
+    #pragma region Noob
     auto ap_menu = menu->AddSubMenu("Appearance", "appearance");
     ap_menu->AddCheckBox("Enable Skins", "jinx.skin.changer", false);
     ap_menu->AddSlider("SkinId", "jinx.skin.id", 1, 1, 50);
 
     switch(g_LocalPlayer->ChampionId()) {
-        case ChampionId::Tristana: return EzTristana::on_load(menu);
+        case ChampionId::Tristana:
+            return EzTristana::on_boot(menu);
 
-        case ChampionId::Jinx: return EzJinx::on_boot(menu);
+        case ChampionId::Jinx:
+            return EzJinx::on_boot(menu);
 
-        case ChampionId::Vayne: return EzCamille::on_load(menu);
+        case ChampionId::Katarina:
+            return EzKatarina::on_boot(menu);
 
         default: {
                 g_Common->ChatPrint(R"(<font color="#99FF99"><b>[EzSeries]:</b></font><b><font color="#FF3366"> No Support!</font>)"); } } }

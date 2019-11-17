@@ -8,11 +8,11 @@
 class EzTristana : public EzChampion {
     public:
         static void on_boot();
-        static IMenu * on_load(IMenu * menu);
+        static IMenu * on_boot(IMenu * menu);
         static void on_update();
         static void on_post_update();
         static void on_huddraw();
-        static void on_hpbardraw();
+        static void hpbarfill_render();
         static void on_dash(IGameObject * unit, OnProcessSpellEventArgs * args);
         static float edmg(IGameObject * unit);
         static float rdmg(IGameObject * unit);
@@ -29,7 +29,7 @@ inline void EzTristana::on_boot() {
 inline float EzTristana::drawdmg(IGameObject * unit) {
     return rdmg(unit) + edmg(unit); }
 
-inline IMenu * EzTristana::on_load(IMenu * menu) {
+inline IMenu * EzTristana::on_boot(IMenu * menu) {
     on_boot(); // initial load :^)
     auto d_menu = menu->AddSubMenu("Tristana: Draw", "tristana.draww");
     Menu["tristana.draww.en.w"] = d_menu->AddCheckBox("Draw W Range", "tristana.draww.en.w", true);
@@ -65,7 +65,7 @@ inline IMenu * EzTristana::on_load(IMenu * menu) {
     Menu["tristana.use.r.int"] = menu->AddCheckBox("Use R on Channeling", "tristana.use.r.int", true);
     return menu; }
 
-inline void EzTristana::on_hpbardraw() {
+inline void EzTristana::hpbarfill_render() {
     if(!Menu["tristana.draww.en.hp"]->GetBool()) {
         return; }
 

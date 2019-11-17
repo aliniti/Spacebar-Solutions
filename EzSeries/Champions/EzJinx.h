@@ -12,7 +12,7 @@ class EzJinx : public EzChampion {
         static void handle_rockets();
         static void rocket_farm(IGameObject * unit, OnProcessSpellEventArgs * args);
         static void on_huddraw();
-        static void on_hpbar_draw();
+        static void hpbarfill_render();
         static void on_update();
         static void on_delete_obj(IGameObject * unit);
         static void on_post_update();
@@ -205,7 +205,7 @@ inline void EzJinx::on_huddraw() {
     if(Menu["jinx.draww.r1"]->GetBool()) {
         g_Drawing->AddCircle(g_LocalPlayer->Position(), Menu["jinx.maxx.r.dist"]->GetInt(), Menu["jinx.draww.r"]->GetColor(), 2); } }
 
-inline void EzJinx::on_hpbar_draw() {
+inline void EzJinx::hpbarfill_render() {
     if(!Menu["jinx.draww.r.hp"]->GetBool()) {
         return; }
 
