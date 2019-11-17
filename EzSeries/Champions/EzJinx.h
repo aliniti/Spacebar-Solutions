@@ -13,8 +13,10 @@ class EzJinx : public EzChampion {
         static void rocket_farm(IGameObject * unit, OnProcessSpellEventArgs * args);
         static void on_huddraw();
         static void hpbarfill_render();
+
+        static void on_buff(IGameObject * unit, OnBuffEventArgs * args);
         static void on_update();
-        static void on_delete_obj(IGameObject * unit);
+        static void on_destory(IGameObject * unit);
         static void on_post_update();
         static void on_execute(IGameObject * unit);
         static void on_before_attack(BeforeAttackOrbwalkerArgs * args);
@@ -66,6 +68,7 @@ inline IMenu * EzJinx::on_boot(IMenu * menu) {
     Menu["jinx.use.q.splash4"] = mechanics_menu->AddCheckBox("Q Splash Pow-Pow Stacks Harass", "jinx.use.q.splash4", true);
     Menu["jinx.use.q.splash3"] = mechanics_menu->AddSlider("Q Splash only after Lvl >=", "jinx.use.q.splash.3", 11, 1, 18);
     menu->AddLabel("Automatic: ", "auto", true);
+    Menu["jinx.use.e.tp"] = menu->AddCheckBox("Use E on Teleport", "jinx.use.e.tp", true);
     Menu["jinx.use.e.dash"] = menu->AddCheckBox("Use E on Dashing", "jinx.use.e.dash", true);
     Menu["jinx.use.e.int"] = menu->AddCheckBox("Use E on Immobile", "jinx.use.e.int", true);
     return menu; }
@@ -213,6 +216,12 @@ inline void EzJinx::hpbarfill_render() {
         if(i != nullptr && !i->IsDead() && i->IsVisibleOnScreen() && !i->IsMe() && i->IsValidTarget()) {
             Ex->draw_dmg_hpbar(i, jinx_ult_dmg(i), std::to_string(jinx_ult_dmg(i)).c_str(), Menu["jinx.draww.r.color"]->GetColor()); } } }
 
+inline void EzJinx::on_buff(IGameObject * unit, OnBuffEventArgs * args) {
+    if(!unit->IsAlly() && unit->IsValid() && !unit->IsDead()) {
+        if(unit->HasBuff("teleport_target") && Menu["jinx.use.e.tp"]->GetBool()) {
+            if(Spells["jinx.e"]->IsReady() && g_LocalPlayer->Distance(unit) <= Spells["jinx.e"]->Range()) {
+                Spells["jinx.e"]->FastCast(unit->ServerPosition()); } } } }
+
 inline void EzJinx::on_update() {
     // todo jinx ult sucks kinda
     if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
@@ -233,15 +242,27 @@ inline void EzJinx::on_update() {
         auto target = g_Common->GetTarget(Spells["jinx.w"]->Range(), DamageType::Physical);
 
         if(target != nullptr && target->IsValidTarget() && target->Distance(g_LocalPlayer) <= Spells["jinx.w"]->Range()) {
-            if(Spells["jinx.w"]->IsReady() && Menu["jinx.use.w"]->GetBool() && !Menu[target->ChampionName().append("block.zapp")]->GetBool() && (! Menu
-                    ["jinx.use.w.mania"]->GetBool() || !g_LocalPlayer->HasBuff("jinxpassivekillmovementspeed"))) {
+            if(Spells["jinx.w"]->IsReady() && Menu["jinx.use.w"]->GetBool()) {
+                // - check menu nullptr
+                if(Menu[target->ChampionName().append("block.zapp")] == nullptr) {
+                    return; }
+
+                // - block zap on here
+                if(Menu[target->ChampionName().append("block.zapp")]->GetBool()) {
+                    return; }
+
+                // - block zap on mania
+                if(Menu["jinx.use.w.mania"]->GetBool() && g_LocalPlayer->HasBuff("jinxpassivekillmovementspeed")) {
+                    return; }
+
                 const auto pred = Ex->get_prediction(Spells["jinx.w"], target);
                 const auto range = g_LocalPlayer->AttackRange() + g_LocalPlayer->BoundingRadius();
 
                 if(g_LocalPlayer->Distance(target) > range + bonus && g_LocalPlayer->CountMyEnemiesInRange(range) < 1) {
                     if(pred.Hitchance >= Ex->get_prefered_hitchance(target)) {
-                        Spells["jinx.w"]->FastCast(pred.CastPosition); } } } } } // todo: jinx chompers
+                        Spells["jinx.w"]->FastCast(pred.CastPosition); } } } } }
 
+    // todo: jinx chompers
     if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
         auto target = g_Common->GetTarget(Spells["jinx.e"]->Range(), DamageType::Physical);
 
@@ -267,7 +288,7 @@ inline void EzJinx::on_update() {
     handle_rockets();
     on_post_update(); }
 
-inline void EzJinx::on_delete_obj(IGameObject * unit) {}
+inline void EzJinx::on_destory(IGameObject * unit) {}
 
 inline void EzJinx::on_post_update() {
     if(Spells["jinx.e"]->IsReady()) {

@@ -125,7 +125,6 @@
     <ClInclude Include="Champions\EzJinx.h" />
     <ClInclude Include="Champions\EzKatarina.h" />
     <ClInclude Include="Champions\EzCamille.h" />
-    <ClInclude Include="Champions\EzZed.h" />
     <ClInclude Include="Helpers\EzAvoider.h" />
     <ClInclude Include="Helpers\EzEnums.h" />
     <ClInclude Include="SDK\clipper.hpp" />

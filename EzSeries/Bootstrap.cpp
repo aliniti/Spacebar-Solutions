@@ -9,22 +9,29 @@ PLUGIN_API const char PLUGIN_PRINT_NAME[32] = "EzSeries";
 PLUGIN_API const char PLUGIN_PRINT_AUTHOR[32] = "Kurisu";
 PLUGIN_API ChampionId PLUGIN_TARGET_CHAMP = ChampionId::Unknown;
 IMenu * Config = { };
+int DefaultSkinId;
 
 auto on_issue_order(IGameObject * unit, OnIssueOrderEventArgs * args) {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
         return; }
 
     switch(g_LocalPlayer->ChampionId()) {
-        case ChampionId::Katarina: return EzKatarina::on_issue_order(unit, args);
+        case ChampionId::Katarina:
+            return EzKatarina::on_issue_order(unit, args);
 
         default:; } }
+
+
+auto on_pre_create(OnPreCreateObjectEventArgs * args) -> void {
+    if(args->ChampionName == g_LocalPlayer->ChampionName()) {
+        DefaultSkinId = g_LocalPlayer->GetSkinId(); } }
 
 auto on_create(IGameObject * unit) -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
         return; }
 
     switch(g_LocalPlayer->ChampionId()) {
-        case ChampionId::Jinx: return EzKatarina::on_create(unit);
+        case ChampionId::Katarina: return EzKatarina::on_create(unit);
 
         default: ; } }
 
@@ -33,7 +40,7 @@ auto on_delete(IGameObject * unit) -> void {
         return; }
 
     switch(g_LocalPlayer->ChampionId()) {
-        case ChampionId::Jinx: return EzJinx::on_delete_obj(unit);
+        case ChampionId::Jinx: return EzJinx::on_destory(unit);
 
         case ChampionId::Katarina: return EzKatarina::on_destroy(unit);
 
@@ -43,12 +50,17 @@ auto on_update() -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
         return; }
 
-    // temporary
     if(Config->GetSubMenu("appearance")->GetElement("jinx.skin.changer")->GetBool()) {
-        // skin changing
+        // - new skin
         if(g_LocalPlayer->GetSkinId() != Config->GetSubMenu("appearance")->GetElement("jinx.skin.id")->GetInt()) {
             const std::string model_name;
             g_LocalPlayer->SetSkin(Config->GetSubMenu("appearance")->GetElement("jinx.skin.id")->GetInt(), model_name); } }
+
+    else {
+        // - old skin
+        if(g_LocalPlayer->GetSkinId() != DefaultSkinId) {
+            const std::string model_name;
+            g_LocalPlayer->SetSkin(DefaultSkinId, model_name); } }
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana: return EzTristana::on_update();
@@ -57,7 +69,7 @@ auto on_update() -> void {
 
         case ChampionId::Katarina: return EzKatarina::on_update();
 
-        default: ; } }
+        default: return; } }
 
 auto on_draw() -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
@@ -96,7 +108,14 @@ auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void {
         case ChampionId::Katarina:
             return EzKatarina::on_buff(unit, args);
 
+        case ChampionId::Jinx:
+            return EzJinx::on_buff(unit, args);
+
         default: ; } }
+
+void on_teleport(IGameObject * sender, OnTeleportEventArgs * args) {
+    if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
+        return; } }
 
 auto on_cast_spell(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
@@ -157,8 +176,11 @@ auto build_menu(IMenu * menu) -> IMenu * {
 
 void on_crypt_str(const char * str, int hash) {}
 
+
 PLUGIN_API bool OnLoadSDK(IPluginsSDK * plugin_sdk) {
     DECLARE_GLOBALS(plugin_sdk);
+    EventHandler<Events::OnPreCreateObject>::AddEventHandler(on_pre_create);
+    EventHandler<Events::OnTeleport>::AddEventHandler(on_teleport);
     EventHandler<Events::OnCryptString>::AddEventHandler(on_crypt_str);
     EventHandler<Events::GameUpdate>::AddEventHandler(on_update);
     EventHandler<Events::OnHudDraw>::AddEventHandler(on_draw);
@@ -174,6 +196,8 @@ PLUGIN_API bool OnLoadSDK(IPluginsSDK * plugin_sdk) {
     return true; }
 
 PLUGIN_API void OnUnloadSDK() {
+    EventHandler<Events::OnPreCreateObject>::RemoveEventHandler(on_pre_create);
+    EventHandler<Events::OnTeleport>::RemoveEventHandler(on_teleport);
     EventHandler<Events::OnCryptString>::RemoveEventHandler(on_crypt_str);
     EventHandler<Events::GameUpdate>::RemoveEventHandler(on_update);
     EventHandler<Events::OnHudDraw>::RemoveEventHandler(on_draw);
