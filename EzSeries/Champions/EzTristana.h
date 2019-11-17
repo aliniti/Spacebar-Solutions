@@ -24,7 +24,7 @@ inline void EzTristana::on_boot() {
     Spells["tristana.q"] = g_Common->AddSpell(SpellSlot::Q);
     Spells["tristana.e"] = g_Common->AddSpell(SpellSlot::E);
     Spells["tristana.r"] = g_Common->AddSpell(SpellSlot::R);
-    g_Common->ChatPrint(R"(<font color="#FFCC00"><b>EzSeries Tristana:</b></font><b><font color="#99FF99"> Loaded!</font>)"); }
+    g_Common->ChatPrint(R"(<font color="#FFCC00"><b>[EzSeries Tristana]:</b></font><b><font color="#99FF99"> Loaded!</font>)"); }
 
 inline float EzTristana::drawdmg(IGameObject * unit) {
     return rdmg(unit) + edmg(unit); }
@@ -70,7 +70,7 @@ inline void EzTristana::on_hpbardraw() {
         return; }
 
     for(auto i : g_ObjectManager->GetChampions()) {
-        if(i != nullptr && !i->IsDead() && i->IsVisibleOnScreen() && !i->IsMe() && i->IsValidTarget()) {
+        if(i != nullptr && !i->IsDead() && i->IsVisibleOnScreen() && !i->IsAlly() && i->IsValidTarget()) {
             EzExtensions::draw_dmg_hpbar(i, drawdmg(i), std::to_string(drawdmg(i)).c_str(), Menu["tristana.draww.hp"]->GetColor()); } } }
 
 inline void EzTristana::on_dash(IGameObject * unit, OnProcessSpellEventArgs * args) {
