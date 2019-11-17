@@ -179,6 +179,7 @@ void on_crypt_str(const char * str, int hash) {}
 
 PLUGIN_API bool OnLoadSDK(IPluginsSDK * plugin_sdk) {
     DECLARE_GLOBALS(plugin_sdk);
+    EventHandler<Events::OnIssueOrder>::AddEventHandler(on_issue_order);
     EventHandler<Events::OnPreCreateObject>::AddEventHandler(on_pre_create);
     EventHandler<Events::OnTeleport>::AddEventHandler(on_teleport);
     EventHandler<Events::OnCryptString>::AddEventHandler(on_crypt_str);
@@ -196,6 +197,7 @@ PLUGIN_API bool OnLoadSDK(IPluginsSDK * plugin_sdk) {
     return true; }
 
 PLUGIN_API void OnUnloadSDK() {
+    EventHandler<Events::OnIssueOrder>::RemoveEventHandler(on_issue_order);
     EventHandler<Events::OnPreCreateObject>::RemoveEventHandler(on_pre_create);
     EventHandler<Events::OnTeleport>::RemoveEventHandler(on_teleport);
     EventHandler<Events::OnCryptString>::RemoveEventHandler(on_crypt_str);
