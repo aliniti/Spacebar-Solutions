@@ -61,8 +61,7 @@ inline auto EzKatarina::on_postupdate() -> void {
         auto key = i.first;
         auto blade = i.second;
 
-        if(!blade->IsValid() || blade == nullptr || !blade->IsVisible() ||
-            blade->Distance(g_LocalPlayer) <= Spells["katarina.w"]->Range()) {
+        if(!blade->IsValid() || blade == nullptr || !blade->IsVisible()) {
             all_blades.erase(key);
             break; }
 
