@@ -7,16 +7,19 @@
 
 class EzTristana : public EzChampion {
     public:
-        static void on_boot();
+
         static IMenu * on_boot(IMenu * menu);
+        static void on_boot();
         static void on_update();
         static void on_post_update();
         static void on_huddraw();
         static void hpbarfill_render();
         static void on_dash(IGameObject * unit, OnProcessSpellEventArgs * args);
+
         static float edmg(IGameObject * unit);
         static float rdmg(IGameObject * unit);
         static float drawdmg(IGameObject * unit);
+
         static void on_execute(IGameObject * unit);
         static void on_before_attack(BeforeAttackOrbwalkerArgs * args); };
 

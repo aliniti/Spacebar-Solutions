@@ -258,7 +258,7 @@ inline void EzJinx::on_update() {
                 const auto pred = Ex->get_prediction(Spells["jinx.w"], target);
                 const auto range = g_LocalPlayer->AttackRange() + g_LocalPlayer->BoundingRadius();
 
-                if(g_LocalPlayer->Distance(target) > range + bonus && g_LocalPlayer->CountMyEnemiesInRange(range) < 1) {
+                if(g_LocalPlayer->Distance(target) > range + bonus && g_LocalPlayer->CountMyEnemiesInRange(range + bonus) < 1) {
                     if(pred.Hitchance >= Ex->get_prefered_hitchance(target)) {
                         Spells["jinx.w"]->FastCast(pred.CastPosition); } } } } }
 
