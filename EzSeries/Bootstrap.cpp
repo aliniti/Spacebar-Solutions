@@ -50,11 +50,11 @@ auto on_update() -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
         return; }
 
-    if(Config->GetSubMenu("appearance")->GetElement("jinx.skin.changer")->GetBool()) {
+    if(Config->GetSubMenu("skins")->GetElement("skin.changer")->GetBool()) {
         // - new skin
-        if(g_LocalPlayer->GetSkinId() != Config->GetSubMenu("appearance")->GetElement("jinx.skin.id")->GetInt()) {
+        if(g_LocalPlayer->GetSkinId() != Config->GetSubMenu("appearance")->GetElement("skin.id")->GetInt()) {
             const std::string model_name;
-            g_LocalPlayer->SetSkin(Config->GetSubMenu("appearance")->GetElement("jinx.skin.id")->GetInt(), model_name); } }
+            g_LocalPlayer->SetSkin(Config->GetSubMenu("appearance")->GetElement("skin.id")->GetInt(), model_name); } }
 
     else {
         // - old skin
@@ -156,9 +156,9 @@ auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
         default: ; } }
 
 auto build_menu(IMenu * menu) -> IMenu * {
-    auto ap_menu = menu->AddSubMenu(std::string(g_LocalPlayer->ChampionName()).append(": Skins"), "appearance");
-    ap_menu->AddCheckBox("Enable Skins", "jinx.skin.changer", false);
-    ap_menu->AddSlider("SkinId", "jinx.skin.id", 1, 1, 50);
+    auto ap_menu = menu->AddSubMenu(std::string(g_LocalPlayer->ChampionName()).append(": Skins"), "skins");
+    ap_menu->AddCheckBox("Enable Skins", "skin.changer", false);
+    ap_menu->AddSlider("SkinId", "skin.id", 1, 1, 50);
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana:
@@ -171,7 +171,7 @@ auto build_menu(IMenu * menu) -> IMenu * {
             return EzKatarina::on_boot(menu);
 
         default: {
-                g_Common->ChatPrint(R"(<font color="#CC6666"><b>[EzSeries]:</b></font><b><font color="#FF3366"> No Support!</font>)"); } } }
+                g_Common->ChatPrint(R"(<font color="#CC6666"><b>[EzSeries]:</b></font><b><font color="#99FF99"> Not Supported!</font>)"); } } }
 
 void on_crypt_str(const char * str, int hash) {}
 
@@ -195,7 +195,7 @@ PLUGIN_API bool OnLoadSDK(IPluginsSDK * plugin_sdk) {
     Config = build_menu(g_Menu->CreateMenu("EzSeries", "EzSeries.v3"));
     return true; }
 
-PLUGIN_API void OnUnloadSDK() {
+void remove_events() {
     EventHandler<Events::OnIssueOrder>::RemoveEventHandler(on_issue_order);
     EventHandler<Events::OnPreCreateObject>::RemoveEventHandler(on_pre_create);
     EventHandler<Events::OnTeleport>::RemoveEventHandler(on_teleport);
@@ -211,3 +211,6 @@ PLUGIN_API void OnUnloadSDK() {
     EventHandler<Events::OnBeforeAttackOrbwalker>::RemoveEventHandler(on_before_attack);
     EventHandler<Events::OnDoCast>::RemoveEventHandler(on_do_cast);
     Config->Remove(); }
+
+PLUGIN_API void OnUnloadSDK() {
+    remove_events(); }
