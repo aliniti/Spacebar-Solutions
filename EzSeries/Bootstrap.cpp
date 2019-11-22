@@ -156,8 +156,7 @@ auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
         default: ; } }
 
 auto build_menu(IMenu * menu) -> IMenu * {
-    #pragma region Noob
-    auto ap_menu = menu->AddSubMenu("Appearance", "appearance");
+    auto ap_menu = menu->AddSubMenu(std::string(g_LocalPlayer->ChampionName()).append(": Skins"), "appearance");
     ap_menu->AddCheckBox("Enable Skins", "jinx.skin.changer", false);
     ap_menu->AddSlider("SkinId", "jinx.skin.id", 1, 1, 50);
 
@@ -172,7 +171,7 @@ auto build_menu(IMenu * menu) -> IMenu * {
             return EzKatarina::on_boot(menu);
 
         default: {
-                g_Common->ChatPrint(R"(<font color="#99FF99"><b>[EzSeries]:</b></font><b><font color="#FF3366"> No Support!</font>)"); } } }
+                g_Common->ChatPrint(R"(<font color="#CC6666"><b>[EzSeries]:</b></font><b><font color="#FF3366"> No Support!</font>)"); } } }
 
 void on_crypt_str(const char * str, int hash) {}
 
@@ -193,7 +192,7 @@ PLUGIN_API bool OnLoadSDK(IPluginsSDK * plugin_sdk) {
     EventHandler<Events::OnProcessSpellCast>::AddEventHandler(on_cast_spell);
     EventHandler<Events::OnBeforeAttackOrbwalker>::AddEventHandler(on_before_attack);
     EventHandler<Events::OnDoCast>::AddEventHandler(on_do_cast);
-    Config = build_menu(g_Menu->CreateMenu("EzSeries", "EzSeries"));
+    Config = build_menu(g_Menu->CreateMenu("EzSeries", "EzSeries.v3"));
     return true; }
 
 PLUGIN_API void OnUnloadSDK() {

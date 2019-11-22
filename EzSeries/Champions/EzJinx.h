@@ -31,7 +31,7 @@ inline void EzJinx::init() {
     Spells["jinx.r"] = g_Common->AddSpell(SpellSlot::R, 3000);
     Spells["jinx.r"]->SetSkillshot(0.6, 250, 1700, kCollidesWithYasuoWall | kCollidesWithHeroes, kSkillshotLine);
     g_Log->Print("EzSeries: Jinx Loaded!");
-    g_Common->ChatPrint(R"(<font color="#FF9966"><b>[EzSeries Jinx]:</b></font><b><font color="#99FF99"> Loaded!</font>)"); }
+    g_Common->ChatPrint(R"(<font color="#CC6666"><b>[EzSeries Jinx]:</b></font><b><font color="#99FF99"> Loaded!</font>)"); }
 
 inline IMenu * EzJinx::on_boot(IMenu * menu) {
     init();
@@ -42,15 +42,15 @@ inline IMenu * EzJinx::on_boot(IMenu * menu) {
     Menu["jinx.use.r"] = c_menu->AddCheckBox("Use Super Mega Death Rocket", "jinx.use.r", true);
     auto d_menu = menu->AddSubMenu("Jinx: Draw", "jinx.draww");
     Menu["jinx.draww.aa1"] = d_menu->AddCheckBox("Draw Switcheroo", "jinx.use.aa1", true);
-    Menu["jinx.draww.aa"] = d_menu->AddColorPicker("-> Color Switcheroo", "jinx.draww.aa", 255, 153, 102, 80);
+    Menu["jinx.draww.aa"] = d_menu->AddColorPicker("-> Color Switcheroo", "jinx.draww.aa", 204, 102, 102, 115);
     Menu["jinx.draww.e1"] = d_menu->AddCheckBox("Draw Chompers", "jinx.use.e1", true);
-    Menu["jinx.draww.e"] = d_menu->AddColorPicker("-> Color Chompers", "jinx.draww.e", 255, 153, 102, 80);
+    Menu["jinx.draww.e"] = d_menu->AddColorPicker("-> Color Chompers", "jinx.draww.e", 204, 102, 102, 115);
     Menu["jinx.draww.w1"] = d_menu->AddCheckBox("Draw Zap", "jinx.use.w1", true);
-    Menu["jinx.draww.w"] = d_menu->AddColorPicker("-> Color Zap", "jinx.draww.w", 255, 153, 102, 80);
+    Menu["jinx.draww.w"] = d_menu->AddColorPicker("-> Color Zap", "jinx.draww.w", 204, 102, 102, 115);
     Menu["jinx.draww.r1"] = d_menu->AddCheckBox("Draw Super Mega Death Rocket", "jinx.use.r1", true);
-    Menu["jinx.draww.r"] = d_menu->AddColorPicker("-> Color Super Mega Death Rocket", "jinx.draww.r", 255, 153, 102, 80);
+    Menu["jinx.draww.r"] = d_menu->AddColorPicker("-> Color Super Mega Death Rocket", "jinx.draww.r", 204, 102, 102, 115);
     Menu["jinx.draww.r.hp"] = d_menu->AddCheckBox("Draw HpBarDraw R Dmg", "jinx.draww.r.hp", true);
-    Menu["jinx.draww.r.color"] = d_menu->AddColorPicker("-> Color HpBarDraw", "jinx.draww.r.color", 255, 153, 102, 185);
+    Menu["jinx.draww.r.color"] = d_menu->AddColorPicker("-> Color HpBarDraw", "jinx.draww.r.color", 204, 102, 102, 115);
     auto mechanics_menu = menu->AddSubMenu("Jinx: Mechanics", "jinx.mechanics");
     auto zap_menu = mechanics_menu->AddSubMenu("Zap Settings", "zap.settings");
     Menu["jinx.use.w.mania"] = zap_menu->AddCheckBox("Block Zap on Mania", "jinx.use.w.mania", true);

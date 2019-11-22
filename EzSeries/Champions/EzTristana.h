@@ -27,7 +27,7 @@ inline void EzTristana::on_boot() {
     Spells["tristana.q"] = g_Common->AddSpell(SpellSlot::Q);
     Spells["tristana.e"] = g_Common->AddSpell(SpellSlot::E);
     Spells["tristana.r"] = g_Common->AddSpell(SpellSlot::R);
-    g_Common->ChatPrint(R"(<font color="#FFCC00"><b>[EzSeries Tristana]:</b></font><b><font color="#99FF99"> Loaded!</font>)"); }
+    g_Common->ChatPrint(R"(<font color="#CC6666"><b>[EzSeries Tristana]:</b></font><b><font color="#99FF99"> Loaded!</font>)"); }
 
 inline float EzTristana::drawdmg(IGameObject * unit) {
     return rdmg(unit) + edmg(unit); }
@@ -36,11 +36,11 @@ inline IMenu * EzTristana::on_boot(IMenu * menu) {
     on_boot(); // initial load :^)
     auto d_menu = menu->AddSubMenu("Tristana: Draw", "tristana.draww");
     Menu["tristana.draww.en.w"] = d_menu->AddCheckBox("Draw W Range", "tristana.draww.en.w", true);
-    Menu["tristana.draww.w"] = d_menu->AddColorPicker("W Range Color", "tristana.draww.w", 255, 204, 0, 185);
+    Menu["tristana.draww.w"] = d_menu->AddColorPicker("W Range Color", "tristana.draww.w", 204, 102, 102, 185);
     Menu["tristana.draww.en.r"] = d_menu->AddCheckBox("Draw R Range", "tristana.draww.en.r", true);
-    Menu["tristana.draww.r"] = d_menu->AddColorPicker("R Range Color", "tristana.draww.r", 255, 204, 0, 185);
+    Menu["tristana.draww.r"] = d_menu->AddColorPicker("R Range Color", "tristana.draww.r", 204, 102, 102, 185);
     Menu["tristana.draww.en.hp"] = d_menu->AddCheckBox("Draw R HpBarFill", "tristana.draww.en.hp", true);
-    Menu["tristana.draww.hp"] = d_menu->AddColorPicker("R HpBarFill Color", "tristana.draww.hp", 255, 204, 0, 185); // menu setup..
+    Menu["tristana.draww.hp"] = d_menu->AddColorPicker("R HpBarFill Color", "tristana.draww.hp", 204, 102, 102, 185); // menu setup..
     auto c_menu = menu->AddSubMenu("Tristana: Core", "tristana.core");
     Menu["tristana.use.q"] = c_menu->AddCheckBox("Use Q", "tristana.use.q", true);
     Menu["tristana.use.e"] = c_menu->AddCheckBox("Use E", "tristana.use.e", true);
