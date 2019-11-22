@@ -195,7 +195,8 @@ PLUGIN_API bool OnLoadSDK(IPluginsSDK * plugin_sdk) {
     Config = build_menu(g_Menu->CreateMenu("EzSeries", "EzSeries.v3"));
     return true; }
 
-void remove_events() {
+PLUGIN_API void OnUnloadSDK() {
+    EzChampion::Clear();
     EventHandler<Events::OnIssueOrder>::RemoveEventHandler(on_issue_order);
     EventHandler<Events::OnPreCreateObject>::RemoveEventHandler(on_pre_create);
     EventHandler<Events::OnTeleport>::RemoveEventHandler(on_teleport);
@@ -211,6 +212,3 @@ void remove_events() {
     EventHandler<Events::OnBeforeAttackOrbwalker>::RemoveEventHandler(on_before_attack);
     EventHandler<Events::OnDoCast>::RemoveEventHandler(on_do_cast);
     Config->Remove(); }
-
-PLUGIN_API void OnUnloadSDK() {
-    remove_events(); }

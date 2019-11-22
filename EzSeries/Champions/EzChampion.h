@@ -13,8 +13,13 @@ class EzChampion {
 
         static std::map<std::string, EzAvoider *> AvoidList;
         static std::map<float, EzAvoider *> DangerPoints;
+        static auto Clear() -> void; };
 
-};
+inline auto EzChampion::Clear() -> void {
+    Spells.clear();
+    Items.clear();
+    Ticks.clear();
+    Menu.clear(); }
 
 EzExtensions * EzChampion::Ex;
 std::map<std::string, std::shared_ptr<ISpell>>  EzChampion::Spells;
