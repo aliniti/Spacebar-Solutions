@@ -118,7 +118,7 @@ inline auto EzCamille::can_w(IGameObject * unit) -> bool {
 
         else {
             if(q_dmg(unit, false) + g_LocalPlayer->AutoAttackDamage(unit, true) * 1 >= unit->RealHealth(true, true)) {
-                return  false; } } }
+                return false; } } }
 
     if(g_LocalPlayer->Distance(unit) <= g_LocalPlayer->AttackRange() + 35) {
         if(g_LocalPlayer->AutoAttackDamage(unit, true) * 3 >= unit->RealHealth(true, true)) {
@@ -127,7 +127,7 @@ inline auto EzCamille::can_w(IGameObject * unit) -> bool {
     return true; }
 
 inline auto EzCamille::lock_w(IGameObject * unit) -> void {
-    if(on_wall() ||is_dashing() || unit == nullptr) {
+    if(on_wall() || is_dashing() || unit == nullptr) {
         return; }
 
     if(charging_w() && g_LocalPlayer->Distance(unit) <= Spells["camille.w"]->Range() + unit->BoundingRadius() + g_LocalPlayer->BoundingRadius()) {
@@ -242,10 +242,15 @@ inline auto EzCamille::use_r(IGameObject * unit, bool force) -> void {}
 #pragma region damage
 
 inline auto EzCamille::lethal_target(IGameObject * unit) -> bool {}
+
 inline auto EzCamille::c_dmg(IGameObject * unit) -> double {}
+
 inline auto EzCamille::q_dmg(IGameObject * unit, bool includeq2) -> double {}
+
 inline auto EzCamille::w_dmg(IGameObject * unit, bool bonus) -> double {}
+
 inline auto EzCamille::e_dmg(IGameObject * unit) -> double {}
+
 inline auto EzCamille::r_dmg(double dmg, IGameObject * unit) -> double {}
 
 #pragma endregion

@@ -179,4 +179,3 @@ inline auto EzExtensions::draw_dmg_hpbar(IGameObject * unit, double damage, cons
 
 inline auto EzExtensions::is_plant(IGameObject * unit) -> bool {
     return strstr(unit->Name().c_str(), "Plant"); }
-

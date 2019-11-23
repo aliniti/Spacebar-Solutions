@@ -98,6 +98,7 @@ inline float EzJinx::jinx_ult_dmg(IGameObject * unit) {
     return d; }
 
 inline void EzJinx::handle_rockets() {
+    // jinx has minigun out
     if(!g_LocalPlayer->HasBuff(hash("jinxq"))) {
         if(Menu["jinx.use.q"]->GetBool()) {
             // jinx ranges
@@ -247,7 +248,7 @@ inline void EzJinx::on_update() {
                 if(Menu[target->ChampionName().append("block.zapp")] == nullptr) {
                     return; }
 
-                // - block zap on here
+                // - block zap on hero
                 if(Menu[target->ChampionName().append("block.zapp")]->GetBool()) {
                     return; }
 
@@ -306,8 +307,9 @@ inline void EzJinx::on_execute(IGameObject * unit) {}
 
 inline void EzJinx::on_before_attack(BeforeAttackOrbwalkerArgs * args) {
     if(args->Target == nullptr || !args->Target->IsValidTarget()) {
-        return; } // jinx has rockets out
+        return; }
 
+    // jinx has rockets out
     if(g_LocalPlayer->HasBuff(hash("jinxq"))) {
         // jinx ranges
         const auto bonus = std::vector<int> {75, 100, 125, 150, 175 } [Spells["jinx.q"]->Level() - 1];

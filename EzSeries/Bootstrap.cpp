@@ -8,8 +8,9 @@
 PLUGIN_API const char PLUGIN_PRINT_NAME[32] = "EzSeries";
 PLUGIN_API const char PLUGIN_PRINT_AUTHOR[32] = "Kurisu";
 PLUGIN_API ChampionId PLUGIN_TARGET_CHAMP = ChampionId::Unknown;
-IMenu * Config = { };
-int DefaultSkinId;
+
+IMenu * config = { };
+int default_skin_id;
 
 auto on_issue_order(IGameObject * unit, OnIssueOrderEventArgs * args) {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
@@ -19,12 +20,12 @@ auto on_issue_order(IGameObject * unit, OnIssueOrderEventArgs * args) {
         case ChampionId::Katarina:
             return EzKatarina::on_issue_order(unit, args);
 
-        default:; } }
+        default: ; } }
 
 
 auto on_pre_create(OnPreCreateObjectEventArgs * args) -> void {
     if(args->ChampionName == g_LocalPlayer->ChampionName()) {
-        DefaultSkinId = g_LocalPlayer->GetSkinId(); } }
+        default_skin_id = g_LocalPlayer->GetSkinId(); } }
 
 auto on_create(IGameObject * unit) -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
@@ -50,18 +51,6 @@ auto on_update() -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
         return; }
 
-    if(Config->GetSubMenu("skins")->GetElement("skin.changer")->GetBool()) {
-        // - new skin
-        if(g_LocalPlayer->GetSkinId() != Config->GetSubMenu("appearance")->GetElement("skin.id")->GetInt()) {
-            const std::string model_name;
-            g_LocalPlayer->SetSkin(Config->GetSubMenu("appearance")->GetElement("skin.id")->GetInt(), model_name); } }
-
-    else {
-        // - old skin
-        if(g_LocalPlayer->GetSkinId() != DefaultSkinId) {
-            const std::string model_name;
-            g_LocalPlayer->SetSkin(DefaultSkinId, model_name); } }
-
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana: return EzTristana::on_update();
 
@@ -69,7 +58,20 @@ auto on_update() -> void {
 
         case ChampionId::Katarina: return EzKatarina::on_update();
 
-        default: return; } }
+        default: ; }
+
+    if(config->GetSubMenu("skins")->GetElement("skin.changer")->GetBool()) {
+        // - new skin
+        if(g_LocalPlayer->GetSkinId() != config->GetSubMenu("skins")->GetElement("skin.id")->GetInt()) {
+            const std::string model_name;
+            g_LocalPlayer->SetSkin(config->GetSubMenu("skins")->GetElement("skin.id")->GetInt(), model_name); } }
+
+    else {
+        // - old skin
+        if(g_LocalPlayer->GetSkinId() != default_skin_id) {
+            const std::string model_name;
+            g_LocalPlayer->SetSkin(default_skin_id, model_name); } } }
+
 
 auto on_draw() -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
@@ -114,8 +116,7 @@ auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void {
         default: ; } }
 
 void on_teleport(IGameObject * sender, OnTeleportEventArgs * args) {
-    if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
-        return; } }
+    if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {} }
 
 auto on_cast_spell(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
@@ -123,8 +124,6 @@ auto on_cast_spell(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana: return EzTristana::on_dash(unit, args);
-
-        case ChampionId::Katarina: return EzKatarina::on_spell_cast(unit, args);
 
         default: ; } }
 
@@ -156,9 +155,6 @@ auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
         default: ; } }
 
 auto build_menu(IMenu * menu) -> IMenu * {
-    auto ap_menu = menu->AddSubMenu(std::string(g_LocalPlayer->ChampionName()).append(": Skins"), "skins");
-    ap_menu->AddCheckBox("Enable Skins", "skin.changer", false);
-    ap_menu->AddSlider("SkinId", "skin.id", 1, 1, 50);
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana:
@@ -178,6 +174,12 @@ void on_crypt_str(const char * str, int hash) {}
 
 PLUGIN_API bool OnLoadSDK(IPluginsSDK * plugin_sdk) {
     DECLARE_GLOBALS(plugin_sdk);
+
+    config = build_menu(g_Menu->CreateMenu("EzSeries", "EzSeries.v3"));
+    config->AddSubMenu(std::string(g_LocalPlayer->ChampionName()).append(": Skins"), "skins");
+    config->AddCheckBox("Enable Skins", "skin.changer", false);
+    config->AddSlider("SkinId", "skin.id", 1, 1, 50);
+
     EventHandler<Events::OnIssueOrder>::AddEventHandler(on_issue_order);
     EventHandler<Events::OnPreCreateObject>::AddEventHandler(on_pre_create);
     EventHandler<Events::OnTeleport>::AddEventHandler(on_teleport);
@@ -192,11 +194,9 @@ PLUGIN_API bool OnLoadSDK(IPluginsSDK * plugin_sdk) {
     EventHandler<Events::OnProcessSpellCast>::AddEventHandler(on_cast_spell);
     EventHandler<Events::OnBeforeAttackOrbwalker>::AddEventHandler(on_before_attack);
     EventHandler<Events::OnDoCast>::AddEventHandler(on_do_cast);
-    Config = build_menu(g_Menu->CreateMenu("EzSeries", "EzSeries.v3"));
     return true; }
 
 PLUGIN_API void OnUnloadSDK() {
-    EzChampion::Clear();
     EventHandler<Events::OnIssueOrder>::RemoveEventHandler(on_issue_order);
     EventHandler<Events::OnPreCreateObject>::RemoveEventHandler(on_pre_create);
     EventHandler<Events::OnTeleport>::RemoveEventHandler(on_teleport);
@@ -211,4 +211,4 @@ PLUGIN_API void OnUnloadSDK() {
     EventHandler<Events::OnProcessSpellCast>::RemoveEventHandler(on_cast_spell);
     EventHandler<Events::OnBeforeAttackOrbwalker>::RemoveEventHandler(on_before_attack);
     EventHandler<Events::OnDoCast>::RemoveEventHandler(on_do_cast);
-    Config->Remove(); }
+    config->Remove(); }
