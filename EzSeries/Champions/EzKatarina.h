@@ -49,6 +49,7 @@ inline auto EzKatarina::on_boot(IMenu * menu) -> IMenu * {
     return menu; }
 
 inline auto EzKatarina::on_issue_order(IGameObject * unit, OnIssueOrderEventArgs * args) -> void {
+    // block evade from interrupting ult?
     if(unit->IsMe() && unit->HasBuff("katarinarsound")) {
         if(unit->HasBuff("katarinarsound") &&
             unit->CountEnemiesInRange(Spells["katarina.r"]->Range()) > 0) {
@@ -60,8 +61,8 @@ inline auto EzKatarina::on_pre_update() -> void {
         if(Spells["katarina.e"]->IsReady() && Menu["katarina.use.e"]->GetBool()) {
             auto target = g_Common->GetTarget(Spells["katarina.e"]->Range(), DamageType::Magical);
 
-            // todo: more logic on this later
-            if(target && blade_dmg(target, 2) >= target->RealHealth(true, true)) {
+            // todo: more or different logic on this later xd
+            if(target && blade_dmg(target, min(1, all_blades.size())) >= target->RealHealth(true, true)) {
                 // - find a shunpo position
                 const auto position = shunpo_position(target);
 
@@ -104,6 +105,13 @@ inline auto EzKatarina::on_update() -> void {
             g_LocalPlayer->CountEnemiesInRange(Spells["katarina.r"]->Range()) > 0) {
             return; }
 
+        // - gunblade
+        if(g_LocalPlayer->HasItem(ItemId::Hextech_Gunblade) && g_LocalPlayer->CanUseItem(ItemId::Hextech_Gunblade)) {
+            auto target = g_Common->GetTarget(dynamic_range(), DamageType::Magical);
+
+            if(target != nullptr && target->IsValidTarget()) {
+                g_LocalPlayer->CastItem(ItemId::Hextech_Gunblade, target); } }
+
         // - shunpo target
         if(Spells["katarina.e"]->IsReady() && Menu["katarina.use.e"]->GetBool()) {
             auto target = g_Common->GetTarget(Spells["katarina.e"]->Range(), DamageType::Magical);
@@ -123,7 +131,7 @@ inline auto EzKatarina::on_update() -> void {
 
         // - death lotus
         if(Spells["katarina.r"]->IsReady() && Menu["katarina.use.r"]->GetBool()) {
-            auto target = g_Common->GetTarget(dynamic_range() + 100, DamageType::Magical);
+            auto target = g_Common->GetTarget(dynamic_range(), DamageType::Magical);
 
             // -- temp logic for now
             if(!Spells["katarina.q"]->IsReady() && !Spells["katarina.w"]->IsReady() && !Spells["katarina.e"]->IsReady()) {

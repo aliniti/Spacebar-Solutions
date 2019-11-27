@@ -14,42 +14,54 @@ int default_skin_id;
 
 auto on_issue_order(IGameObject * unit, OnIssueOrderEventArgs * args) {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
-        return; }
+        return;
+    }
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Katarina:
             return EzKatarina::on_issue_order(unit, args);
 
-        default: ; } }
+        default: ;
+    }
+}
 
 
 auto on_pre_create(OnPreCreateObjectEventArgs * args) -> void {
     if(args->ChampionName == g_LocalPlayer->ChampionName()) {
-        default_skin_id = g_LocalPlayer->GetSkinId(); } }
+        default_skin_id = g_LocalPlayer->GetSkinId();
+    }
+}
 
 auto on_create(IGameObject * unit) -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
-        return; }
+        return;
+    }
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Katarina: return EzKatarina::on_create(unit);
 
-        default: ; } }
+        default: ;
+    }
+}
 
 auto on_delete(IGameObject * unit) -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
-        return; }
+        return;
+    }
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Jinx: return EzJinx::on_destory(unit);
 
         case ChampionId::Katarina: return EzKatarina::on_destroy(unit);
 
-        default: ; } }
+        default: ;
+    }
+}
 
 auto on_update() -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
-        return; }
+        return;
+    }
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana: return EzTristana::on_update();
@@ -58,24 +70,31 @@ auto on_update() -> void {
 
         case ChampionId::Katarina: return EzKatarina::on_update();
 
-        default: ; }
+        default: ;
+    }
 
     if(config->GetSubMenu("skins")->GetElement("skin.changer")->GetBool()) {
         // - new skin
         if(g_LocalPlayer->GetSkinId() != config->GetSubMenu("skins")->GetElement("skin.id")->GetInt()) {
             const std::string model_name;
-            g_LocalPlayer->SetSkin(config->GetSubMenu("skins")->GetElement("skin.id")->GetInt(), model_name); } }
+            g_LocalPlayer->SetSkin(config->GetSubMenu("skins")->GetElement("skin.id")->GetInt(), model_name);
+        }
+    }
 
     else {
         // - old skin
         if(g_LocalPlayer->GetSkinId() != default_skin_id) {
             const std::string model_name;
-            g_LocalPlayer->SetSkin(default_skin_id, model_name); } } }
+            g_LocalPlayer->SetSkin(default_skin_id, model_name);
+        }
+    }
+}
 
 
 auto on_draw() -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
-        return; }
+        return;
+    }
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana: return EzTristana::on_huddraw();
@@ -84,11 +103,14 @@ auto on_draw() -> void {
 
         case ChampionId::Katarina: return EzKatarina::on_hud_draw();
 
-        default: ; } }
+        default: ;
+    }
+}
 
 auto hpbarfill_render() -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
-        return; }
+        return;
+    }
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana:
@@ -100,11 +122,14 @@ auto hpbarfill_render() -> void {
         case ChampionId::Katarina:
             return EzKatarina::hpbarfill_render();
 
-        default: ; } }
+        default: ;
+    }
+}
 
 auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
-        return; }
+        return;
+    }
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Katarina:
@@ -113,37 +138,48 @@ auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void {
         case ChampionId::Jinx:
             return EzJinx::on_buff(unit, args);
 
-        default: ; } }
+        default: ;
+    }
+}
 
 void on_teleport(IGameObject * sender, OnTeleportEventArgs * args) {
-    if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {} }
+    if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {}
+}
 
 auto on_cast_spell(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
-        return; }
+        return;
+    }
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana: return EzTristana::on_dash(unit, args);
 
-        default: ; } }
+        default: ;
+    }
+}
 
 auto on_play_animation(IGameObject * unit, OnPlayAnimationEventArgs * args) -> void {
-    if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {} }
+    if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {}
+}
 
 auto on_before_attack(BeforeAttackOrbwalkerArgs * args) -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
-        return; }
+        return;
+    }
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana: return EzTristana::on_before_attack(args);
 
         case ChampionId::Jinx: return EzJinx::on_before_attack(args);
 
-        default: ; } }
+        default: ;
+    }
+}
 
 auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
-        return; }
+        return;
+    }
 
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Jinx: return EzJinx::on_do_cast(unit, args);
@@ -152,10 +188,11 @@ auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
 
         case ChampionId::Katarina: return EzKatarina::on_do_cast(unit, args);
 
-        default: ; } }
+        default: ;
+    }
+}
 
 auto build_menu(IMenu * menu) -> IMenu * {
-
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana:
             return EzTristana::on_boot(menu);
@@ -167,23 +204,23 @@ auto build_menu(IMenu * menu) -> IMenu * {
             return EzKatarina::on_boot(menu);
 
         default: {
-                g_Common->ChatPrint(R"(<font color="#CC6666"><b>[EzSeries]:</b></font><b><font color="#99FF99"> Not Supported!</font>)"); } } }
+                g_Common->ChatPrint(R"(<font color="#CC6666"><b>[EzSeries]:</b></font><b><font color="#99FF99"> Not Supported!</font>)");
+            }
+    }
+}
 
 void on_crypt_str(const char * str, int hash) {}
 
 
 PLUGIN_API bool OnLoadSDK(IPluginsSDK * plugin_sdk) {
     DECLARE_GLOBALS(plugin_sdk);
-
     config = build_menu(g_Menu->CreateMenu("EzSeries", "EzSeries.v3"));
     config->AddSubMenu(std::string(g_LocalPlayer->ChampionName()).append(": Skins"), "skins");
     config->AddCheckBox("Enable Skins", "skin.changer", false);
     config->AddSlider("SkinId", "skin.id", 1, 1, 50);
-
     EventHandler<Events::OnIssueOrder>::AddEventHandler(on_issue_order);
     EventHandler<Events::OnPreCreateObject>::AddEventHandler(on_pre_create);
     EventHandler<Events::OnTeleport>::AddEventHandler(on_teleport);
-    EventHandler<Events::OnCryptString>::AddEventHandler(on_crypt_str);
     EventHandler<Events::GameUpdate>::AddEventHandler(on_update);
     EventHandler<Events::OnHudDraw>::AddEventHandler(on_draw);
     EventHandler<Events::OnHPBarDraw>::AddEventHandler(hpbarfill_render);
@@ -194,13 +231,13 @@ PLUGIN_API bool OnLoadSDK(IPluginsSDK * plugin_sdk) {
     EventHandler<Events::OnProcessSpellCast>::AddEventHandler(on_cast_spell);
     EventHandler<Events::OnBeforeAttackOrbwalker>::AddEventHandler(on_before_attack);
     EventHandler<Events::OnDoCast>::AddEventHandler(on_do_cast);
-    return true; }
+    return true;
+}
 
 PLUGIN_API void OnUnloadSDK() {
     EventHandler<Events::OnIssueOrder>::RemoveEventHandler(on_issue_order);
     EventHandler<Events::OnPreCreateObject>::RemoveEventHandler(on_pre_create);
     EventHandler<Events::OnTeleport>::RemoveEventHandler(on_teleport);
-    EventHandler<Events::OnCryptString>::RemoveEventHandler(on_crypt_str);
     EventHandler<Events::GameUpdate>::RemoveEventHandler(on_update);
     EventHandler<Events::OnHudDraw>::RemoveEventHandler(on_draw);
     EventHandler<Events::OnHPBarDraw>::RemoveEventHandler(hpbarfill_render);
@@ -211,4 +248,5 @@ PLUGIN_API void OnUnloadSDK() {
     EventHandler<Events::OnProcessSpellCast>::RemoveEventHandler(on_cast_spell);
     EventHandler<Events::OnBeforeAttackOrbwalker>::RemoveEventHandler(on_before_attack);
     EventHandler<Events::OnDoCast>::RemoveEventHandler(on_do_cast);
-    config->Remove(); }
+    config->Remove();
+}

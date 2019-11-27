@@ -78,17 +78,13 @@ enum class Events : int32_t
 	OnIssueOrder,
 	OnNewPath,
 	OnPlayAnimation,
-	OnCryptString,
 	OnPreCreateObject,
 	OnStopCast,
 	OnTeleport,
-	OnTurretRange,
 	OnUpdateChargeableSpell,
 	OnGlowRender,
-	OnMenuDraw,
 	OnBeforeAttackOrbwalker,
 	OnAfterAttackOrbwalker,
-	OnSurrenderVote,
 	OnEventHandler
 };
 
@@ -781,4 +777,13 @@ enum class ItemId
 	Force_of_Nature = 4401,
 	Innervating_Locket = 4402,
 	Stat_Stick_of_Stoicism = 4403
+};
+
+enum class eDragonIds : int
+{
+	Infernal = 1,
+	Cloud = 2,
+	Ocean = 3,
+	Mountain = 4,
+	Elder = 5
 };
