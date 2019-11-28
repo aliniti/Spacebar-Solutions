@@ -36,6 +36,7 @@ class EzCamille : public EzChampion {
         static void on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args); };
 
 inline IMenu * EzCamille::on_load(IMenu * menu) {
+
     // todo: setup items
     Spells["camille.q"] = g_Common->AddSpell(SpellSlot::Q);
     Spells["camille.w"] = g_Common->AddSpell(SpellSlot::W, 625);
@@ -61,8 +62,7 @@ inline auto EzCamille::on_wall() -> bool {
         strcmp("CamilleE", g_LocalPlayer->GetSpellbook()->GetSpell(SpellSlot::E)->SData().SpellName.c_str()) != 0; }
 
 inline auto EzCamille::is_dashing() -> bool {
-    g_LocalPlayer->HasBuff("camilleedash1") || g_LocalPlayer->HasBuff("camilleedash2") || g_LocalPlayer->IsDashing();
-    return false; }
+    return g_LocalPlayer->HasBuff("camilleedash1") || g_LocalPlayer->HasBuff("camilleedash2") || g_LocalPlayer->IsDashing(); }
 
 inline auto EzCamille::knocked_back(IGameObject * unit) -> bool {
     return unit != nullptr && unit->HasBuff("camilleeknockback2"); }
@@ -93,7 +93,7 @@ inline void EzCamille::use_w(IGameObject * unit) {
             Spells["camille.w"]->FastCast(unit->ServerPosition()); } } }
 
 inline auto EzCamille::can_w(IGameObject * unit) -> bool {
-    const float animationtime = 2000;
+    const float time = 2000;
 
     if(on_wall() || is_dashing() || unit == nullptr) {
         return false; }
@@ -105,11 +105,11 @@ inline auto EzCamille::can_w(IGameObject * unit) -> bool {
     if(Spells["camille.q"]->IsReady()) {
         for(auto i : g_LocalPlayer->GetBuffList()) {
             if(strcmp("camilleqprimingstart", i.Name.c_str())) {
-                if(i.EndTime - g_Common->Time() * 1000 <= animationtime) {
+                if(i.EndTime - g_Common->Time() * 1000 <= time) {
                     return false; } }
 
             if(strcmp("camilleqprimingcomplete", i.Name.c_str())) {
-                if(i.EndTime - g_Common->Time() * 1000 <= animationtime) {
+                if(i.EndTime - g_Common->Time() * 1000 <= time) {
                     return false; } } }
 
         if(!has_q() || has_q2()) {
@@ -117,7 +117,8 @@ inline auto EzCamille::can_w(IGameObject * unit) -> bool {
                 return false; } }
 
         else {
-            if(q_dmg(unit, false) + g_LocalPlayer->AutoAttackDamage(unit, true) * 1 >= unit->RealHealth(true, true)) {
+            if(q_dmg(unit, false) + g_LocalPlayer->AutoAttackDamage(unit, true) *
+                1 >= unit->RealHealth(true, true)) {
                 return false; } } }
 
     if(g_LocalPlayer->Distance(unit) <= g_LocalPlayer->AttackRange() + 35) {
@@ -150,92 +151,12 @@ inline auto EzCamille::lock_w(Vector pos) -> void {
             Ticks["issueOrder"] = g_Common->TickCount(); } } }
 
 inline auto EzCamille::use_e(Vector pos, bool combo) -> void {
+    // - moving to extensions
     if(is_dashing() || on_wall() || !Spells["camille.e"]->IsReady()) {
-        return; }
-
-    if(combo) {
-        if(g_LocalPlayer->Distance(pos) - g_LocalPlayer->BoundingRadius() * 2 < Menu["minimum.e.range"]->GetInt()) {
-            return; }
-
-        if(pos.IsUnderEnemyTurret() && Menu["dont.e.under.enemy.turret"]->GetBool()) {
-            return; } }
-
-    auto posChecked = 0;
-    auto maxPosChecked = 40;
-    auto posRadius = 145;
-    auto radiusIndex = 0;
-
-    if(Menu["enhanced.e.precision"]->GetBool()) {
-        maxPosChecked = 80;
-        posRadius = 65; }
-
-    auto candidate_pos_list = std::vector<Vector>();
-
-    while(posChecked < maxPosChecked) {
-        radiusIndex++;
-        const auto cur_radius = radiusIndex * (0x2 * posRadius);
-        const auto cur_curcle_checks = static_cast<int>(ceil((0x2 * M_PI * cur_radius) / (0x2 * static_cast<double>(posRadius))));
-
-        for(auto i = 1; i < cur_curcle_checks; i++) {
-            posChecked++;
-            const auto c_radians = (0x2 * M_PI / (cur_curcle_checks - 0x1)) * i;
-            const auto x_pos = static_cast<float>(floor(pos.x + cur_radius * cos(c_radians)));
-            const auto y_pos = static_cast<float>(floor(pos.y + cur_radius * sin(c_radians)));
-            const auto v = Vector2(x_pos, y_pos);
-            auto pos_ex = Ex->to_3d(v);
-            auto any_dangerous_pos = false;
-
-            for(auto entry : DangerPoints) {
-                auto obj = entry.second;
-
-                if(obj->aType == Outside && Ex->dist_2d(pos_ex, obj->Emitter->Position()) > obj->Radius) {
-                    any_dangerous_pos = true;
-                    break; }
-
-                if(obj->aType == Inside) {
-                    const auto & start_pos = pos_ex;
-                    const auto & end_pos = pos;
-                    // emitter pos.. check intersection
-                    const auto init_pos = entry.second->Emitter->Position();
-                    const auto proj = init_pos.ProjectOn(start_pos, end_pos);
-
-                    if(proj.IsOnSegment && Ex->dist_2d(proj.SegmentPoint, init_pos) <= obj->Radius + g_LocalPlayer->BoundingRadius()) {
-                        any_dangerous_pos = true;
-                        break; } } }
-
-            if(any_dangerous_pos) {
-                continue; }
-
-            auto extra_unit = g_Common->GetTarget(Spells["camille.w"]->Range(), DamageType::Physical);
-
-            if(extra_unit != nullptr && extra_unit->IsValidTarget() && charging_w()) {
-                if(Ex->dist_2d(Ex->to_2d(extra_unit->ServerPosition()), pos_ex) > Spells["camille.w"]->Range() - 100) {
-                    continue; } }
-
-            if(g_NavMesh->HasFlag(pos_ex, kNavFlagsWall)) {
-                candidate_pos_list.push_back(pos_ex); }
-
-            std::sort(candidate_pos_list.begin(), candidate_pos_list.end(), [&](Vector a, Vector b) {
-                switch(Menu["preferred.hook.position"]->GetInt()) {
-                    case 0:
-                        return a.Distance(pos) < b.Distance(pos);
-
-                    case 1:
-                        return a.Distance(g_LocalPlayer->ServerPosition()) < b.Distance(g_LocalPlayer->ServerPosition());
-
-                    default: return a.Distance(pos) < b.Distance(pos); } }); } }
-
-    if(charging_w() == false) {
-        for(auto vec : candidate_pos_list) {
-            if(vec.IsValid()) {
-                if(g_LocalPlayer->ServerPosition().Distance(vec) <= Spells["camille.e"]->Range() && vec.Distance(pos) <= Spells["camille.e"]->Range()) {
-                    if(vec.IsValid()) {
-                        if(Spells["camille.e"]->FastCast(vec)) {
-                            Ticks["camille.e"] = g_Common->TickCount(); } } } } } } }
+        return; } }
 
 
 inline auto EzCamille::use_r(IGameObject * unit, bool force) -> void {}
-
 
 #pragma endregion
 

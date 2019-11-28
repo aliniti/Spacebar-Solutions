@@ -4,6 +4,7 @@
 #include "Champions/EzJinx.h"
 #include "Champions/EzCamille.h"
 #include "Champions/EzKatarina.h"
+#include "Champions/EzDebug.h"
 // oh dis...
 PLUGIN_API const char PLUGIN_PRINT_NAME[32] = "EzSeries";
 PLUGIN_API const char PLUGIN_PRINT_AUTHOR[32] = "Kurisu";
@@ -34,7 +35,11 @@ auto on_create(IGameObject * unit) -> void {
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Katarina: return EzKatarina::on_create(unit);
 
-        default: ; } }
+        case ChampionId::Ornn: return EzDebug::on_create(unit);
+
+        default:;
+
+    } }
 
 auto on_delete(IGameObject * unit) -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
@@ -160,6 +165,9 @@ auto build_menu(IMenu * menu) -> IMenu * {
 
         case ChampionId::Katarina:
             return EzKatarina::on_boot(menu);
+
+        case ChampionId::Ornn:
+            return EzDebug::on_boot(menu);
 
         default: {
                 g_Common->ChatPrint(R"(<font color="#CC6666"><b>[EzSeries]:</b></font><b><font color="#99FF99"> Not Supported!</font>)"); } } }
