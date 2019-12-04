@@ -36,7 +36,6 @@ class EzCamille : public EzChampion {
         static void on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args); };
 
 inline IMenu * EzCamille::on_load(IMenu * menu) {
-
     // todo: setup items
     Spells["camille.q"] = g_Common->AddSpell(SpellSlot::Q);
     Spells["camille.w"] = g_Common->AddSpell(SpellSlot::W, 625);
@@ -152,8 +151,7 @@ inline auto EzCamille::lock_w(Vector pos) -> void {
 
 inline auto EzCamille::use_e(Vector pos, bool combo) -> void {
     // - moving to extensions
-    if(is_dashing() || on_wall() || !Spells["camille.e"]->IsReady()) {
-        return; } }
+    if(is_dashing() || on_wall() || !Spells["camille.e"]->IsReady()) {} }
 
 
 inline auto EzCamille::use_r(IGameObject * unit, bool force) -> void {}

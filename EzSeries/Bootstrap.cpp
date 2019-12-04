@@ -23,7 +23,6 @@ auto on_issue_order(IGameObject * unit, OnIssueOrderEventArgs * args) {
 
         default: ; } }
 
-
 auto on_pre_create(OnPreCreateObjectEventArgs * args) -> void {
     if(args->ChampionName == g_LocalPlayer->ChampionName()) {
         default_skin_id = g_LocalPlayer->GetSkinId(); } }
@@ -37,9 +36,7 @@ auto on_create(IGameObject * unit) -> void {
 
         case ChampionId::Ornn: return EzDebug::on_create(unit);
 
-        default:;
-
-    } }
+        default: ; } }
 
 auto on_delete(IGameObject * unit) -> void {
     if(g_LocalPlayer->IsDead() || !g_Common->IsWindowFocused()) {
@@ -110,7 +107,6 @@ auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void {
         return; }
 
     switch(g_LocalPlayer->ChampionId()) {
-
         case ChampionId::Jinx:
             return EzJinx::on_buff(unit, args);
 

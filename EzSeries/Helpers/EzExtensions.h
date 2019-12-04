@@ -25,7 +25,9 @@ class EzExtensions {
         static auto project_on_path(Vector start, Vector end, float width, float range, std::vector<IGameObject *> & units, bool minion) -> int;
 
         static auto draw_dmg_hpbar(IGameObject * unit, double damage, const char * text, DWORD color) -> void;
-        static auto is_plant(IGameObject * unit) -> bool; };
+        static auto is_plant(IGameObject * unit) -> bool;
+        static auto get_real_position(float delay) -> Vector;
+        static auto check_path_collision(IGameObject * unit, Vector pos); };
 
 
 inline Vector2 EzExtensions::to_2d(Vector p) {
@@ -179,3 +181,26 @@ inline auto EzExtensions::draw_dmg_hpbar(IGameObject * unit, double damage, cons
 
 inline auto EzExtensions::is_plant(IGameObject * unit) -> bool {
     return strstr(unit->Name().c_str(), "Plant"); }
+
+inline auto EzExtensions::get_real_position(float delay) -> Vector {
+
+    auto path = g_LocalPlayer->Path();
+
+    if(path.size() < 1) {
+        return g_LocalPlayer->ServerPosition(); }
+
+    auto dir = (path[0] - g_LocalPlayer->ServerPosition()).Normalized();
+    return  g_LocalPlayer->ServerPosition() + dir * g_LocalPlayer->MoveSpeed() * (delay / 1000); }
+
+inline auto EzExtensions::check_path_collision(IGameObject * unit, Vector pos) {
+    auto path = g_LocalPlayer->CreatePath(g_LocalPlayer->ServerPosition(), pos);
+
+    if(path.size() > 0) {
+        if(pos.Distance(path[path.size() - 1]) > 5 || path.size() > 2) {
+            return true; } }
+
+    return false; }
+
+
+
+
