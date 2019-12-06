@@ -2,9 +2,9 @@
 #include "SDK/EventHandler.h"
 #include "Champions/EzTristana.h"
 #include "Champions/EzJinx.h"
-#include "Champions/EzCamille.h"
 #include "Champions/EzKatarina.h"
-#include "Champions/EzDebug.h"
+#include "Champions/EzVayne.h"
+
 // oh dis...
 PLUGIN_API const char PLUGIN_PRINT_NAME[32] = "EzSeries";
 PLUGIN_API const char PLUGIN_PRINT_AUTHOR[32] = "Kurisu";
@@ -32,9 +32,11 @@ auto on_create(IGameObject * unit) -> void {
         return; }
 
     switch(g_LocalPlayer->ChampionId()) {
-        case ChampionId::Katarina: return EzKatarina::on_create(unit);
+        case ChampionId::Katarina:
+            return EzKatarina::on_create(unit);
 
-        case ChampionId::Ornn: return EzDebug::on_create(unit);
+        case ChampionId::Ornn:
+            return EzVayne::on_create(unit);
 
         default: ; } }
 
@@ -43,7 +45,8 @@ auto on_delete(IGameObject * unit) -> void {
         return; }
 
     switch(g_LocalPlayer->ChampionId()) {
-        case ChampionId::Jinx: return EzJinx::on_destory(unit);
+        case ChampionId::Jinx:
+            return EzJinx::on_destory(unit);
 
         default: ; } }
 
@@ -52,11 +55,17 @@ auto on_update() -> void {
         return; }
 
     switch(g_LocalPlayer->ChampionId()) {
-        case ChampionId::Tristana: return EzTristana::on_update();
+        case ChampionId::Tristana:
+            return EzTristana::on_update();
 
-        case ChampionId::Jinx: return EzJinx::on_update();
+        case ChampionId::Jinx:
+            return EzJinx::on_update();
 
-        case ChampionId::Katarina: return EzKatarina::on_update();
+        case ChampionId::Katarina:
+            return EzKatarina::on_update();
+
+        case ChampionId::Vayne:
+            return EzVayne::on_update();
 
         default: ; }
 
@@ -78,11 +87,17 @@ auto on_draw() -> void {
         return; }
 
     switch(g_LocalPlayer->ChampionId()) {
-        case ChampionId::Tristana: return EzTristana::on_huddraw();
+        case ChampionId::Tristana:
+            return EzTristana::on_huddraw();
 
-        case ChampionId::Jinx: return EzJinx::on_huddraw();
+        case ChampionId::Jinx:
+            return EzJinx::on_huddraw();
 
-        case ChampionId::Katarina: return EzKatarina::on_hud_draw();
+        case ChampionId::Katarina:
+            return EzKatarina::on_hud_draw();
+
+        case ChampionId::Vayne:
+            return EzVayne::on_draw();
 
         default: ; } }
 
@@ -100,6 +115,9 @@ auto hpbarfill_render() -> void {
         case ChampionId::Katarina:
             return EzKatarina::hpbarfill_render();
 
+        case ChampionId::Vayne:
+            return EzVayne::hpbarfill_render();
+
         default: ; } }
 
 auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void {
@@ -109,6 +127,9 @@ auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void {
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Jinx:
             return EzJinx::on_buff(unit, args);
+
+        case ChampionId::Vayne:
+            return EzVayne::on_buff(unit, args);
 
         default: ; } }
 
@@ -120,7 +141,8 @@ auto on_cast_spell(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
         return; }
 
     switch(g_LocalPlayer->ChampionId()) {
-        case ChampionId::Tristana: return EzTristana::on_dash(unit, args);
+        case ChampionId::Tristana:
+            return EzTristana::on_dash(unit, args);
 
         default: ; } }
 
@@ -132,9 +154,11 @@ auto on_before_attack(BeforeAttackOrbwalkerArgs * args) -> void {
         return; }
 
     switch(g_LocalPlayer->ChampionId()) {
-        case ChampionId::Tristana: return EzTristana::on_before_attack(args);
+        case ChampionId::Tristana:
+            return EzTristana::on_before_attack(args);
 
-        case ChampionId::Jinx: return EzJinx::on_before_attack(args);
+        case ChampionId::Jinx:
+            return EzJinx::on_before_attack(args);
 
         default: ; } }
 
@@ -143,11 +167,14 @@ auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
         return; }
 
     switch(g_LocalPlayer->ChampionId()) {
-        case ChampionId::Jinx: return EzJinx::on_do_cast(unit, args);
+        case ChampionId::Jinx:
+            return EzJinx::on_do_cast(unit, args);
 
-        case ChampionId::Vayne: return EzCamille::on_do_cast(unit, args);
+        case ChampionId::Vayne:
+            return EzVayne::on_do_cast(unit, args);
 
-        case ChampionId::Katarina: return EzKatarina::on_do_cast(unit, args);
+        case ChampionId::Katarina:
+            return EzKatarina::on_do_cast(unit, args);
 
         default: ; } }
 
@@ -162,8 +189,8 @@ auto build_menu(IMenu * menu) -> IMenu * {
         case ChampionId::Katarina:
             return EzKatarina::on_boot(menu);
 
-        case ChampionId::Ornn:
-            return EzDebug::on_boot(menu);
+        case ChampionId::Vayne:
+            return EzVayne::on_boot(menu);
 
         default: {
                 g_Common->ChatPrint(R"(<font color="#CC6666"><b>[EzSeries]:</b></font><b><font color="#99FF99"> Not Supported!</font>)"); } } }

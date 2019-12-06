@@ -27,7 +27,9 @@ class EzExtensions {
         static auto draw_dmg_hpbar(IGameObject * unit, double damage, const char * text, DWORD color) -> void;
         static auto is_plant(IGameObject * unit) -> bool;
         static auto get_real_position(float delay) -> Vector;
-        static auto check_path_collision(IGameObject * unit, Vector pos); };
+        static auto check_path_collision(IGameObject * unit, Vector pos);
+        static auto get_near_wall_point(Vector start, Vector end) -> Vector;
+        static auto check_point_collision(IGameObject * unit, Vector pos) -> bool; };
 
 
 inline Vector2 EzExtensions::to_2d(Vector p) {
@@ -200,6 +202,29 @@ inline auto EzExtensions::check_path_collision(IGameObject * unit, Vector pos) {
             return true; } }
 
     return false; }
+
+inline auto EzExtensions::get_near_wall_point(Vector start, Vector end) -> Vector {
+    auto dir = (end - start).Normalized();
+    auto distance = start.Distance(end);
+
+    for(auto i = 20; i < distance; i += 20) {
+        auto v = end - dir * i;
+
+        if(v.IsWall()) {
+            return v; } }
+
+    return { 0, 0, 0 }; }
+
+inline auto EzExtensions::check_point_collision(IGameObject * unit, Vector pos) -> bool {
+    auto path = unit->CreatePath(pos);
+
+    if(path.size() > 0) {
+        if(pos.Distance(path[path.size() - 1]) > 5) {
+            return true; } }
+
+    return false; }
+
+
 
 
 
