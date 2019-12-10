@@ -2,7 +2,6 @@
 #include "EzChampion.h"
 #include "../SDK/PluginSDK.h"
 
-
 class EzCamille : public EzChampion {
     public:
         static IMenu * on_load(IMenu * menu);
@@ -30,10 +29,7 @@ class EzCamille : public EzChampion {
         static auto q_dmg(IGameObject * unit, bool includeq2 = true) -> double;
         static auto w_dmg(IGameObject * unit, bool bonus = false) -> double;
         static auto e_dmg(IGameObject * unit) -> double;
-        static auto r_dmg(double dmg, IGameObject * unit) -> double;
-
-        // -> event hooks
-        static void on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args); };
+        static auto r_dmg(double dmg, IGameObject * unit) -> double; };
 
 inline IMenu * EzCamille::on_load(IMenu * menu) {
     // todo: setup items
@@ -173,5 +169,3 @@ inline auto EzCamille::e_dmg(IGameObject * unit) -> double {}
 inline auto EzCamille::r_dmg(double dmg, IGameObject * unit) -> double {}
 
 #pragma endregion
-
-inline void EzCamille::on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) {}
