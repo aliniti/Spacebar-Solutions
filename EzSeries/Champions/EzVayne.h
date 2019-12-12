@@ -134,9 +134,10 @@ inline auto EzVayne::get_tumble_position(IGameObject * unit, float posRadius, in
     if(unit == nullptr) {
         return { 0, 0, 0 }; }
 
-    auto possible_positions = Ex->get_surrounding_positions(g_LocalPlayer->ServerPosition(), posRadius, maxPosChecked);
+    auto best_positions = std::vector<Vector>();
+    auto positions = Ex->get_surrounding_positions(g_LocalPlayer->ServerPosition(), posRadius, maxPosChecked);
 
-    for(auto v : possible_positions) {
+    for(auto v : positions) {
         if(v.Distance(unit->ServerPosition()) <= Menu["vayne.q.comfort.dist"]->GetInt()) {
             continue; }
 
@@ -153,14 +154,15 @@ inline auto EzVayne::get_tumble_position(IGameObject * unit, float posRadius, in
             continue; }
 
         if(Menu["vayne.q.debug"]->GetBool()) {
-            g_Drawing->AddCircle(v, 60, RGBA(204, 102, 102, 115)); } }
+            g_Drawing->AddCircle(v, 60, RGBA(204, 102, 102, 115)); }
+
+        best_positions.push_back(v); }
 
     // - sort closest to cursor
-    std::sort(possible_positions.begin(), possible_positions.end(), [&](Vector v1, Vector v2) {
+    std::sort(best_positions.begin(), best_positions.end(), [&](Vector v1, Vector v2) {
         return v1.Distance(g_Common->CursorPosition()) < v2.Distance(g_Common->CursorPosition()); });
 
-
-    if(!possible_positions.empty()) {
-        return possible_positions.front(); }
+    if(!best_positions.empty()) {
+        return best_positions.front(); }
 
     return { 0, 0, 0 }; }
