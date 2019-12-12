@@ -13,7 +13,7 @@ class EzVayne : public EzChampion {
         static auto on_create(IGameObject * unit) -> void;
         static auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void;
         static auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void;
-        static auto get_tumble_postition(IGameObject * unit, int maxPosChecked, float posRadius) -> Vector; };
+        static auto get_tumble_position(IGameObject * unit, float posRadius, int maxPosChecked) -> Vector; };
 
 inline IMenu * EzVayne::on_boot(IMenu * menu) {
     Spells["vayne.q"] = g_Common->AddSpell(SpellSlot::Q);
@@ -44,7 +44,11 @@ inline void EzVayne::on_update() {
     if(!Menu["use.vayne.e.auto"]->GetBool() || g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
         for(auto u : g_ObjectManager->GetChampions()) {
             if(u && u->IsEnemy()) {
+
                 // - gapclosing?
+                if(g_LocalPlayer->IsRecalling()) {
+                    return; }
+
                 if(Menu["use.vayne.e.dash"]->GetBool()) {
                     const auto pred = g_Common->GetPrediction(u, g_Common->Ping() / 1000);
 
@@ -90,7 +94,7 @@ inline void EzVayne::on_draw() {
 
     auto push_size = Menu["use.vayne.e.dist"]->GetInt();
     auto target = g_Common->GetTarget(Spells["vayne.e"]->Range() + push_size, DamageType::Physical);
-    auto position = get_tumble_postition(target, 15, 60);
+    auto position = get_tumble_position(target, 60, 15);
 
     if(!Menu["vayne.e.debug"]->GetBool()) {
         return; }
@@ -121,58 +125,40 @@ inline void EzVayne::on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * ar
         if(args->IsAutoAttack && Menu["use.vayne.q"]->GetBool()) {
             if(args->Target->IsAIHero() && g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
                 if(Spells["vayne.q"]->IsReady()) {
-                    auto pos = Menu["vayne.q.mode"]->GetInt() == 0 ? g_Common->CursorPosition() : get_tumble_postition(args->Target, 15, 60);
+                    auto pos = Menu["vayne.q.mode"]->GetInt() == 0 ? g_Common->CursorPosition() : get_tumble_position(args->Target, 60, 15);
                     Spells["vayne.q"]->Cast(pos); } } } } }
 
 
-inline auto EzVayne::get_tumble_postition(IGameObject * unit, int maxPosChecked, float posRadius) -> Vector {
+inline auto EzVayne::get_tumble_position(IGameObject * unit, float posRadius, int maxPosChecked) -> Vector {
 
     if(unit == nullptr) {
         return { 0, 0, 0 }; }
 
-    auto pos_checked = 0;
-    auto radius_index = 0;
-    auto possible_positions = std::vector<Vector>();
+    auto possible_positions = Ex->get_surrounding_positions(g_LocalPlayer->ServerPosition(), posRadius, maxPosChecked);
 
-    while(pos_checked < maxPosChecked) {
-        radius_index++;
+    for(auto v : possible_positions) {
+        if(v.Distance(unit->ServerPosition()) <= Menu["vayne.q.comfort.dist"]->GetInt()) {
+            continue; }
 
-        const auto cur_radius = radius_index * (0x2 * posRadius);
-        const auto cur_circle_checks = static_cast<int>(ceil((0x2 * M_PI * cur_radius) / (0x2 * static_cast<double>(posRadius))));
+        if(v.CountEnemiesInRange(Menu["vayne.q.comfort.dist"]->GetInt()) > 0) {
+            continue; }
 
-        for(auto i = 0x1; i < cur_circle_checks; i++) {
-            pos_checked++;
+        if(v.IsWall() && !Menu["vayne.q.wall"]->GetBool()) {
+            continue; }
 
-            const auto c_radians = (0x2 * M_PI / (cur_circle_checks - 0x1)) * i;
-            auto c_circle = Vector(
-                    static_cast<float>(floor(g_LocalPlayer->ServerPosition().x + cur_radius * cos(c_radians))),
-                    static_cast<float>(floor(g_LocalPlayer->ServerPosition().y + cur_radius * sin(c_radians))),
-                    g_LocalPlayer->ServerPosition().z);
+        if(v.Extend(g_LocalPlayer->ServerPosition(), -300).IsWall()) {
+            continue; }
 
-            if(c_circle.Distance(unit->ServerPosition()) <= Menu["vayne.q.comfort.dist"]->GetInt()) {
-                continue; }
+        if(v.Distance(unit->ServerPosition()) > g_LocalPlayer->AttackRange()) {
+            continue; }
 
-            if(c_circle.CountEnemiesInRange(Menu["vayne.q.comfort.dist"]->GetInt()) > 0) {
-                continue; }
-
-            if(c_circle.IsWall() && !Menu["vayne.q.wall"]->GetBool()) {
-                continue; }
-
-            if(c_circle.Distance(unit->ServerPosition()) > g_LocalPlayer->AttackRange()) {
-                continue; }
-
-            if(Menu["vayne.q.debug"]->GetBool()) {
-                g_Drawing->AddCircle(c_circle, 60, RGBA(204, 102, 102, 115)); }
-
-            possible_positions.push_back(c_circle); } }
+        if(Menu["vayne.q.debug"]->GetBool()) {
+            g_Drawing->AddCircle(v, 60, RGBA(204, 102, 102, 115)); } }
 
     // - sort closest to cursor
     std::sort(possible_positions.begin(), possible_positions.end(), [&](Vector v1, Vector v2) {
         return v1.Distance(g_Common->CursorPosition()) < v2.Distance(g_Common->CursorPosition()); });
 
-    //// - then furthest from enemy;
-    //std::sort(possible_positions.begin(), possible_positions.end(), [&](Vector v1, Vector v2) {
-    //    return unit->ServerPosition().Distance(v1) > unit->ServerPosition().Distance(v2); });
 
     if(!possible_positions.empty()) {
         return possible_positions.front(); }

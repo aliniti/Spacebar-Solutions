@@ -29,7 +29,8 @@ class EzExtensions {
         static auto get_real_position(float delay) -> Vector;
         static auto check_path_collision(IGameObject * unit, Vector pos);
         static auto get_near_wall_point(Vector start, Vector end) -> Vector;
-        static auto check_point_collision(IGameObject * unit, Vector pos) -> bool; };
+        static auto check_point_collision(IGameObject * unit, Vector pos) -> bool;
+        static auto get_surrounding_positions(Vector v, float posRadius, int maxPosChecked) -> std::vector<Vector>; };
 
 
 inline Vector2 EzExtensions::to_2d(Vector p) {
@@ -223,6 +224,30 @@ inline auto EzExtensions::check_point_collision(IGameObject * unit, Vector pos) 
             return true; } }
 
     return false; }
+
+inline auto EzExtensions::get_surrounding_positions(Vector v, float posRadius, int maxPosChecked) -> std::vector<Vector> {
+
+    auto pos_checked = 0;
+    auto radius_index = 0;
+    auto possible_positions = std::vector<Vector>();
+
+    while(pos_checked < maxPosChecked) {
+        radius_index++;
+
+        const auto cur_radius = radius_index * (0x2 * posRadius);
+        const auto cur_circle_checks = static_cast<int>(ceil((0x2 * M_PI * cur_radius) / (0x2 * static_cast<double>(posRadius))));
+
+        for(auto i = 0x1; i < cur_circle_checks; i++) {
+            pos_checked++;
+
+            const auto c_radians = (0x2 * M_PI / (cur_circle_checks - 0x1)) * i;
+            auto c_circle = Vector(
+                    static_cast<float>(floor(v.x + cur_radius * cos(c_radians))),
+                    static_cast<float>(floor(v.y + cur_radius * sin(c_radians)), v.z));
+
+            possible_positions.push_back(c_circle); } }
+
+    return possible_positions; }
 
 
 
