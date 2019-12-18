@@ -200,6 +200,7 @@ void on_crypt_str(const char * str, int hash) {}
 
 PLUGIN_API bool OnLoadSDK(IPluginsSDK * plugin_sdk) {
     DECLARE_GLOBALS(plugin_sdk);
+
     config = build_menu(g_Menu->CreateMenu("EzSeries", "EzSeries.v3"));
     config->AddCheckBox("Enable Skins", "skin.changer", false);
     config->AddSlider("SkinId", "skin.id", 1, 1, 50);

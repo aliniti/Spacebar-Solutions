@@ -98,7 +98,7 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>echo F | xcopy "$(TargetDir)$(ProjectName).dll" "C:\Users\aliniti\Desktop\Spacebar\Plugins" /Y</Command>
+      <Command>echo F | xcopy "$(TargetDir)$(ProjectName).dll" "B:\spacebar\Plugins" /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

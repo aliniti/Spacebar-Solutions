@@ -4,7 +4,7 @@
 
 class EzKatarina : public EzChampion {
     public:
-        static auto on_boot(IMenu * menu)->IMenu*;
+        static auto on_boot(IMenu * menu) -> IMenu*;
         static auto on_issue_order(IGameObject * unit, OnIssueOrderEventArgs * args) -> void;
         static auto on_update() -> void;
         static auto on_pre_update() -> void;
@@ -15,7 +15,7 @@ class EzKatarina : public EzChampion {
         static std::map<float, Vector> blade_vectors;
         static std::map<float, IGameObject *> all_blades;
 
-        static auto shunpo_position(IGameObject * unitNear)->Vector;
+        static auto shunpo_position(IGameObject * unitNear) -> Vector;
         static auto dynamic_range() -> float;
         static auto on_create(IGameObject * unit) -> void;
         static auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void;
@@ -60,16 +60,15 @@ inline auto EzKatarina::on_pre_update() -> void {
     if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
         // - shunpo target if enough damage hopefully?
         if(Spells["katarina.e"]->IsReady() && Menu["katarina.use.e"]->GetBool()) {
-            auto target = g_Common->GetTarget(Spells["katarina.e"]->Range(), DamageType::Magical);
+            for(auto target : g_ObjectManager->GetChampions()) {
+                // todo: more or different logic on this later xd
+                if(target != nullptr && target->IsValidTarget() && blade_dmg(target) >= target->RealHealth(true, true)) {
+                    // - find a shunpo position
+                    const auto position = shunpo_position(target);
 
-            // todo: more or different logic on this later xd
-            if(target != nullptr && blade_dmg(target) >= target->RealHealth(true, true)) {
-                // - find a shunpo position
-                const auto position = shunpo_position(target);
-
-                if(position.IsValid() && g_LocalPlayer->Distance(position) > Spells["katarina.w"]->Range()) {
-                    if(Spells["katarina.e"]->FastCast(position)) {
-                        g_Orbwalker->ResetAA(); } } } } } }
+                    if(position.IsValid() && g_LocalPlayer->Distance(position) > Spells["katarina.w"]->Range()) {
+                        if(Spells["katarina.e"]->FastCast(position)) {
+                            g_Orbwalker->ResetAA(); } } } } } } }
 
 inline auto EzKatarina::on_post_update() -> void {
     // - dagger handling
@@ -300,6 +299,4 @@ inline auto EzKatarina::ult_dmg(IGameObject * unit, int channel_time) -> float {
             (0.22 * g_LocalPlayer->AdditionalAttackDamage()) + (0.19 * g_LocalPlayer->FlatMagicDamageMod()));
     return dmg_per_dagger * (channel_time / dagger_per_sec); }
 
-inline auto EzKatarina::item_dmg(IGameObject * unit) -> float {
-
-}
+inline auto EzKatarina::item_dmg(IGameObject * unit) -> float {}

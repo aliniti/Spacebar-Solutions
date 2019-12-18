@@ -2,7 +2,6 @@
 #include "../Helpers/EzExtensions.h"
 #include "../Helpers/EzAvoider.h"
 
-
 class EzChampion {
     public:
         static EzExtensions * Ex;
