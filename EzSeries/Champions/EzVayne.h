@@ -21,7 +21,7 @@ inline IMenu * EzVayne::on_boot(IMenu * menu) {
     Spells["vayne.r"] = g_Common->AddSpell(SpellSlot::R);
 
     auto q_settings = menu->AddSubMenu("Tumble Settings", "vayne.tumble");
-    Menu["vayne.q.mode"] = q_settings->AddComboBox("Mode", "vayne.q.mode", std::vector<std::string> { "Mouse Position", "Pathfinder (Beta)" }, 0);
+    Menu["vayne.q.mode2"] = q_settings->AddComboBox("Mode", "vayne.q.mode2", std::vector<std::string> { "Mouse Position", }, 0);
 
     q_settings->AddLabel("Pathfinder", "vayne.pathfinder");
     Menu["vayne.q.comfort.dist"] = q_settings->AddSlider("Tumble Comfort Distance", "vayne.q.confort.dist", 320, 0, 420);
@@ -125,7 +125,7 @@ inline void EzVayne::on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * ar
         if(args->IsAutoAttack && Menu["use.vayne.q"]->GetBool()) {
             if(args->Target->IsAIHero() && g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
                 if(Spells["vayne.q"]->IsReady()) {
-                    auto pos = Menu["vayne.q.mode"]->GetInt() == 0 ? g_Common->CursorPosition() : get_tumble_position(args->Target, 60, 15);
+                    auto pos = Menu["vayne.q.mode2"]->GetInt() == 0 ? g_Common->CursorPosition() : get_tumble_position(args->Target, 60, 15);
                     Spells["vayne.q"]->Cast(pos); } } } } }
 
 
@@ -138,6 +138,7 @@ inline auto EzVayne::get_tumble_position(IGameObject * unit, float posRadius, in
     auto positions = Ex->get_surrounding_positions(g_LocalPlayer->ServerPosition(), posRadius, maxPosChecked);
 
     for(auto v : positions) {
+
         if(v.Distance(unit->ServerPosition()) <= Menu["vayne.q.comfort.dist"]->GetInt()) {
             continue; }
 
@@ -154,7 +155,7 @@ inline auto EzVayne::get_tumble_position(IGameObject * unit, float posRadius, in
             continue; }
 
         if(Menu["vayne.q.debug"]->GetBool()) {
-            g_Drawing->AddCircle(v, 60, RGBA(204, 102, 102, 115)); }
+            g_Drawing->AddCircle(v, 60, RGBA(204, 102, 102, 115), 5, 75); }
 
         best_positions.push_back(v); }
 
