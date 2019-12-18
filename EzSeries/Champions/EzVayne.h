@@ -21,7 +21,7 @@ inline IMenu * EzVayne::on_boot(IMenu * menu) {
     Spells["vayne.r"] = g_Common->AddSpell(SpellSlot::R);
 
     auto q_settings = menu->AddSubMenu("Tumble Settings", "vayne.tumble");
-    Menu["vayne.q.mode2"] = q_settings->AddComboBox("Mode", "vayne.q.mode2", std::vector<std::string> { "Mouse Position", }, 0);
+    Menu["vayne.q.mode2"] = q_settings->AddComboBox("Mode", "vayne.q.mode2", std::vector<std::string> { "Mouse Position", "Pathfinder (Broken)" }, 0);
 
     q_settings->AddLabel("Pathfinder", "vayne.pathfinder");
     Menu["vayne.q.comfort.dist"] = q_settings->AddSlider("Tumble Comfort Distance", "vayne.q.confort.dist", 320, 0, 420);
