@@ -59,17 +59,29 @@ inline auto EzKatarina::on_issue_order(IGameObject * unit, OnIssueOrderEventArgs
 
 inline auto EzKatarina::on_pre_update() -> void {
     if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
+
         // - shunpo target if enough damage hopefully?
         if(Spells["katarina.e"]->IsReady() && Menu["katarina.use.e"]->GetBool()) {
             for(auto target : g_ObjectManager->GetChampions()) {
+
                 // todo: more or different logic on this later xd
                 if(target != nullptr && target->IsValidTarget()) {
-                    // - find a shunpo position
-                    const auto position = shunpo_position(target, true);
 
-                    if(position.IsValid()) {
-                        if(Spells["katarina.e"]->FastCast(position)) {
-                            g_Orbwalker->ResetAA(); } } } } } } }
+                    if(e_dmg(target) >= target->RealHealth(true, true)) {
+                        // - find a shunpo position
+                        const auto position = shunpo_position(target, true);
+
+                        if(position.IsValid()) {
+                            if(Spells["katarina.e"]->FastCast(position)) {
+                                g_Orbwalker->ResetAA(); } } }
+
+                    if(blade_dmg(target) >= target->RealHealth(true, true)) {
+                        // - find a shunpo position
+                        const auto position = shunpo_position(target, true);
+
+                        if(position.IsValid()) {
+                            if(Spells["katarina.e"]->FastCast(position)) {
+                                g_Orbwalker->ResetAA(); } } } } } } } }
 
 inline auto EzKatarina::on_post_update() -> void {
     // - dagger handling
@@ -217,20 +229,12 @@ inline auto EzKatarina::shunpo_position(IGameObject * unitNear, bool channeling)
         auto key = b.first;
         auto blade = b.second;
 
-        // - only shunpo blade execute if blade damage can kill unit
-        if(channeling && blade_dmg(unitNear) < unitNear->RealHealth(true, true)) {
-            continue; }
-
         if(unitNear->Distance(blade) <= Spells["katarina.w"]->Range() + unitNear->BoundingRadius()
             && blade->Distance(g_LocalPlayer) <= Spells["katarina.e"]->Range() + Spells["katarina.w"]->Range()) {
-            if(blade->Distance(g_LocalPlayer) > Spells["katarina.w"]->Range() - 75) {
+            if(blade->Distance(g_LocalPlayer) > Spells["katarina.w"]->Range() - 75 ||
+                channeling && g_LocalPlayer->HealthPercent() < 50) {
                 return blade->ServerPosition(); } } }
 
-    // - if no blades only shunpo execute if can kill target
-    if(channeling && e_dmg(unitNear) < unitNear->RealHealth(true, true)) {
-        return { 0, 0, 0 }; }
-
-    // - else cant kill target or no blades found so cast to front of unit (for now)
     return unitNear->ServerPosition() + (g_LocalPlayer->ServerPosition() - unitNear->ServerPosition()).Normalized() * 135; }
 
 inline auto EzKatarina::dynamic_range() -> float {
@@ -278,13 +282,16 @@ inline auto EzKatarina::blade_dmg(IGameObject * unit) -> float {
     if(unit == nullptr || !unit->IsValidTarget()) {
         return 0; }
 
+    if(all_blades.empty()) {
+        return  0; }
+
     const auto base_blade_dmg = std::vector<int> {
         68, 72, 77, 82, 89, 96, 103, 112, 121, 131, 142, 154,
         166, 180, 194, 208, 224, 240 }
     [min(g_LocalPlayer->Level(), 18) - 1];
 
     const auto damage = g_Common->CalculateDamageOnUnit(g_LocalPlayer, unit, DamageType::Magical,
-            base_blade_dmg + (std::vector<double> {0.55, 0.7, 0.85, 1 } [min(g_LocalPlayer->Level(), 18) / 6] *
+            base_blade_dmg + (std::vector<double> {0.45, 0.65, 0.75, 0.95 } [min(g_LocalPlayer->Level(), 18) / 6] *
                 g_LocalPlayer->FlatMagicDamageMod()) + g_LocalPlayer->AdditionalAttackDamage());
 
     for(const auto b : all_blades) {
@@ -313,9 +320,9 @@ inline auto EzKatarina::e_dmg(IGameObject * unit) -> float {
         return 0; }
 
     auto dmg = g_Common->CalculateDamageOnUnit(g_LocalPlayer, unit, DamageType::Magical,
-            std::vector<int> {15, 30, 45, 60, 75 } [Spells["katarina.e"]->Level() - 1] +
+            std::vector<int> {13, 28, 43, 58, 73 } [Spells["katarina.e"]->Level() - 1] +
             (0.5 * g_LocalPlayer->FlatPhysicalDamageMod()) + (0.25 * g_LocalPlayer->FlatMagicDamageMod()));
 
     return dmg; }
 
-inline auto EzKatarina::item_dmg(IGameObject * unit) -> float {}
+inline auto EzKatarina::item_dmg(IGameObject * unit) -> float { }
