@@ -282,9 +282,6 @@ inline auto EzKatarina::blade_dmg(IGameObject * unit) -> float {
     if(unit == nullptr || !unit->IsValidTarget()) {
         return 0; }
 
-    if(all_blades.empty()) {
-        return  0; }
-
     const auto base_blade_dmg = std::vector<int> {
         68, 72, 77, 82, 89, 96, 103, 112, 121, 131, 142, 154,
         166, 180, 194, 208, 224, 240 }
@@ -302,6 +299,9 @@ inline auto EzKatarina::blade_dmg(IGameObject * unit) -> float {
             && blade->Distance(g_LocalPlayer) <= Spells["katarina.e"]->Range() + Spells["katarina.w"]->Range()) {
             if(blade->Distance(g_LocalPlayer) > Spells["katarina.w"]->Range() - 75) {
                 dmg += damage; } } }
+
+    if(all_blades.empty()) {
+        return  0; }
 
     return damage; }
 
