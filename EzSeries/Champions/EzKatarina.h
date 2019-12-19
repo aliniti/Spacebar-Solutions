@@ -15,7 +15,7 @@ class EzKatarina : public EzChampion {
         static std::map<float, Vector> blade_vectors;
         static std::map<float, IGameObject *> all_blades;
 
-        static auto shunpo_position(IGameObject * unitNear, bool execute = false) -> Vector;
+        static auto shunpo_position(IGameObject * unitNear, bool channeling = false) -> Vector;
         static auto dynamic_range() -> float;
         static auto on_create(IGameObject * unit) -> void;
         static auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void;
@@ -63,7 +63,7 @@ inline auto EzKatarina::on_pre_update() -> void {
         if(Spells["katarina.e"]->IsReady() && Menu["katarina.use.e"]->GetBool()) {
             for(auto target : g_ObjectManager->GetChampions()) {
                 // todo: more or different logic on this later xd
-                if(target != nullptr && target->IsValidTarget() && blade_dmg(target) >= target->RealHealth(true, true)) {
+                if(target != nullptr && target->IsValidTarget()) {
                     // - find a shunpo position
                     const auto position = shunpo_position(target, true);
 
@@ -153,7 +153,7 @@ inline auto EzKatarina::on_update() -> void {
             auto target = g_Common->GetTarget(dynamic_range(), DamageType::Magical);
 
             if(target != nullptr && target->IsValidTarget()) {
-                if(!target->IsInAutoAttackRange(g_LocalPlayer)) {
+                if(!g_LocalPlayer->IsInAutoAttackRange(target)) {
                     Spells["katarina.q"]->Cast(target); } } }
 
         // - death lotus
@@ -177,7 +177,7 @@ inline auto EzKatarina::on_update() -> void {
             auto target = g_Common->GetTarget(Spells["katarina.q"]->Range(), DamageType::Magical);
 
             if(target != nullptr && target->IsValidTarget()) {
-                if(!target->IsInAutoAttackRange(g_LocalPlayer)) {
+                if(!g_LocalPlayer->IsInAutoAttackRange(target)) {
                     Spells["katarina.q"]->Cast(target); } } }
 
         // - preparation
@@ -209,7 +209,7 @@ inline void EzKatarina::hpbarfill_render() {
             Ex->draw_dmg_hpbar(i, ult_dmg(i, 2) + blade_dmg(i),
                 "", Menu["katarina.xdraw.x1"]->GetColor()); } } }
 
-inline auto EzKatarina::shunpo_position(IGameObject * unitNear, bool execute) -> Vector {
+inline auto EzKatarina::shunpo_position(IGameObject * unitNear, bool channeling) -> Vector {
     if(unitNear == nullptr || !unitNear->IsValidTarget()) {
         return {0, 0, 0 }; }
 
@@ -217,16 +217,20 @@ inline auto EzKatarina::shunpo_position(IGameObject * unitNear, bool execute) ->
         auto key = b.first;
         auto blade = b.second;
 
+        // - only shunpo blade execute if blade damage can kill unit
+        if(channeling && blade_dmg(unitNear) < unitNear->RealHealth(true, true)) {
+            continue; }
+
         if(unitNear->Distance(blade) <= Spells["katarina.w"]->Range() + unitNear->BoundingRadius()
             && blade->Distance(g_LocalPlayer) <= Spells["katarina.e"]->Range() + Spells["katarina.w"]->Range()) {
-            if(blade->Distance(g_LocalPlayer) > Spells["katarina.w"]->Range() - 75 || execute) {
+            if(blade->Distance(g_LocalPlayer) > Spells["katarina.w"]->Range() - 75) {
                 return blade->ServerPosition(); } } }
 
-    // - we only want to execute if blades are near
-    if(execute && e_dmg(unitNear) < unitNear->RealHealth(true, true)) {
+    // - if no blades only shunpo execute if can kill target
+    if(channeling && e_dmg(unitNear) < unitNear->RealHealth(true, true)) {
         return { 0, 0, 0 }; }
 
-    // - if no blades or can kill target with shunpo cast to front of unit (for now)
+    // - else cant kill target or no blades found so cast to front of unit (for now)
     return unitNear->ServerPosition() + (g_LocalPlayer->ServerPosition() - unitNear->ServerPosition()).Normalized() * 135; }
 
 inline auto EzKatarina::dynamic_range() -> float {
