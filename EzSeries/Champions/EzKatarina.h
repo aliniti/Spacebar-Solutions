@@ -59,14 +59,11 @@ inline auto EzKatarina::on_issue_order(IGameObject * unit, OnIssueOrderEventArgs
 
 inline auto EzKatarina::on_pre_update() -> void {
     if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
-
         // - shunpo target if enough damage hopefully?
         if(Spells["katarina.e"]->IsReady() && Menu["katarina.use.e"]->GetBool()) {
             for(auto target : g_ObjectManager->GetChampions()) {
-
                 // todo: more or different logic on this later xd
                 if(target != nullptr && target->IsValidTarget()) {
-
                     if(e_dmg(target) >= target->RealHealth(true, true)) {
                         // - find a shunpo position
                         const auto position = shunpo_position(target, true);
@@ -300,10 +297,7 @@ inline auto EzKatarina::blade_dmg(IGameObject * unit) -> float {
             if(blade->Distance(g_LocalPlayer) > Spells["katarina.w"]->Range() - 75) {
                 dmg += damage; } } }
 
-    if(all_blades.empty()) {
-        return  0; }
-
-    return damage; }
+    return dmg; }
 
 inline auto EzKatarina::ult_dmg(IGameObject * unit, int channel_time) -> float {
     if(unit == nullptr || !unit->IsValidTarget()) {
@@ -325,4 +319,4 @@ inline auto EzKatarina::e_dmg(IGameObject * unit) -> float {
 
     return dmg; }
 
-inline auto EzKatarina::item_dmg(IGameObject * unit) -> float { }
+inline auto EzKatarina::item_dmg(IGameObject * unit) -> float {}
