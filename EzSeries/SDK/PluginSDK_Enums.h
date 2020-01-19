@@ -453,7 +453,10 @@ enum class ChampionId
 	Neeko = 143,
 	Sylas = 144,
 	Yuumi = 145,
-	Qiyana = 146
+	Qiyana = 146,
+	Senna = 147,
+	Aphelios = 148,
+	Sett = 149
 };
 
 enum class ItemId

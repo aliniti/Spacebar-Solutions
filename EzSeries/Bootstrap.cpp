@@ -4,6 +4,7 @@
 #include "Champions/EzJinx.h"
 #include "Champions/EzKatarina.h"
 #include "Champions/EzVayne.h"
+#include "Champions/EzNeeko.h"
 
 // oh dis...
 PLUGIN_API const char PLUGIN_PRINT_NAME[32] = "EzSeries";
@@ -67,19 +68,10 @@ auto on_update() -> void {
         case ChampionId::Vayne:
             return EzVayne::on_update();
 
-        default: ; }
+        case ChampionId::Neeko:
+            return EzNeeko::on_update();
 
-    if(config->GetElement("skin.changer")->GetBool()) {
-        // - new skin
-        if(g_LocalPlayer->GetSkinId() != config->GetElement("skin.id")->GetInt()) {
-            const std::string model_name;
-            g_LocalPlayer->SetSkin(config->GetElement("skin.id")->GetInt(), model_name); } }
-
-    else {
-        // - old skin
-        if(g_LocalPlayer->GetSkinId() != default_skin_id) {
-            const std::string model_name;
-            g_LocalPlayer->SetSkin(default_skin_id, model_name); } } }
+        default: ; } }
 
 
 auto on_draw() -> void {
@@ -98,6 +90,9 @@ auto on_draw() -> void {
 
         case ChampionId::Vayne:
             return EzVayne::on_draw();
+
+        case ChampionId::Neeko:
+            return EzNeeko::on_draw();
 
         default: ; } }
 
@@ -131,6 +126,9 @@ auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void {
         case ChampionId::Vayne:
             return EzVayne::on_buff(unit, args);
 
+        case ChampionId::Neeko:
+            return EzNeeko::on_buff(unit, args);
+
         default: ; } }
 
 void on_teleport(IGameObject * sender, OnTeleportEventArgs * args) {
@@ -143,6 +141,9 @@ auto on_cast_spell(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana:
             return EzTristana::on_dash(unit, args);
+
+        case ChampionId::Neeko:
+            return EzNeeko::on_cast(unit, args);
 
         default: ; } }
 
@@ -176,6 +177,9 @@ auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
         case ChampionId::Katarina:
             return EzKatarina::on_do_cast(unit, args);
 
+        case ChampionId::Neeko:
+            return EzNeeko::on_do_cast(unit, args);
+
         default: ; } }
 
 auto build_menu(IMenu * menu) -> IMenu * {
@@ -192,6 +196,9 @@ auto build_menu(IMenu * menu) -> IMenu * {
         case ChampionId::Vayne:
             return EzVayne::on_boot(menu);
 
+        case ChampionId::Neeko:
+            return EzNeeko::on_boot(menu);
+
         default: {
                 g_Common->ChatPrint(R"(<font color="#CC6666"><b>[EzSeries]:</b></font><b><font color="#99FF99"> Not Supported!</font>)"); } } }
 
@@ -202,8 +209,6 @@ PLUGIN_API bool OnLoadSDK(IPluginsSDK * plugin_sdk) {
     DECLARE_GLOBALS(plugin_sdk);
 
     config = build_menu(g_Menu->CreateMenu("EzSeries", "EzSeries.v3"));
-    config->AddCheckBox("Enable Skins", "skin.changer", false);
-    config->AddSlider("SkinId", "skin.id", 1, 1, 50);
     EventHandler<Events::OnIssueOrder>::AddEventHandler(on_issue_order);
     EventHandler<Events::OnPreCreateObject>::AddEventHandler(on_pre_create);
     EventHandler<Events::OnTeleport>::AddEventHandler(on_teleport);

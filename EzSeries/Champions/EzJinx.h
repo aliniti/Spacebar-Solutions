@@ -80,7 +80,7 @@ inline float EzJinx::q_splash_range() {
     return 185; }
 
 inline float EzJinx::windup_time(float extraWindup, bool toRockets) {
-    auto realWindup = g_LocalPlayer->AttackCastDelay() * 1000;
+    auto realWindup = g_LocalPlayer->AttackCastDelay(0) * 1000;
     auto delay = 0;
 
     if(toRockets) {
@@ -99,7 +99,7 @@ inline float EzJinx::jinx_ult_dmg(IGameObject * unit) {
 
 inline void EzJinx::handle_rockets() {
     // jinx has minigun out
-    if(!g_LocalPlayer->HasBuff(hash("jinxq"))) {
+    if(!g_LocalPlayer->HasBuff("jinxq")) {
         if(Menu["jinx.use.q"]->GetBool()) {
             // jinx ranges
             const auto bonus = std::vector<int> {75, 100, 125, 150, 175 } [Spells["jinx.q"]->Level() - 1];
@@ -107,8 +107,8 @@ inline void EzJinx::handle_rockets() {
             const auto mana_cap = Ex->get_mana(g_LocalPlayer);
             auto rev_stacks = 0;
 
-            if(g_LocalPlayer->HasBuff(hash("jinxqramp"))) {
-                rev_stacks = g_LocalPlayer->GetBuff(hash("jinxqramp")).Count; }
+            if(g_LocalPlayer->HasBuff("jinxqramp")) {
+                rev_stacks = g_LocalPlayer->GetBuff("jinxqramp").Count; }
 
             // combo minigun -> rockets (combo)
             if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
@@ -117,7 +117,7 @@ inline void EzJinx::handle_rockets() {
                 if(i != nullptr && i->IsValidTarget()) {
                     if(g_LocalPlayer->Level() >= Menu["jinx.use.q.splash3"]->GetInt()) {
                         // q splash mania
-                        if(g_LocalPlayer->HasBuff(hash("jinxpassivekillmovementspeed")) && Menu["jinx.use.q.splash"]->GetBool()) {
+                        if(g_LocalPlayer->HasBuff("jinxpassivekillmovementspeed") && Menu["jinx.use.q.splash"]->GetBool()) {
                             if(mana_cap >= ManaScenario::Medium && i->CountMyEnemiesInRange(q_splash_range()) >= 2) {
                                 // switch
                                 if(Spells["jinx.q"]->IsReady()) {
@@ -310,7 +310,7 @@ inline void EzJinx::on_before_attack(BeforeAttackOrbwalkerArgs * args) {
         return; }
 
     // jinx has rockets out
-    if(g_LocalPlayer->HasBuff(hash("jinxq"))) {
+    if(g_LocalPlayer->HasBuff("jinxq")) {
         // jinx ranges
         const auto bonus = std::vector<int> {75, 100, 125, 150, 175 } [Spells["jinx.q"]->Level() - 1];
         const auto rangew_hit_box = g_LocalPlayer->AttackRange() + args->Target->BoundingRadius() + g_LocalPlayer->BoundingRadius();
@@ -318,20 +318,20 @@ inline void EzJinx::on_before_attack(BeforeAttackOrbwalkerArgs * args) {
         const auto mana_cap = Ex->get_mana(g_LocalPlayer);
         auto rev_stacks = 0;
 
-        if(g_LocalPlayer->HasBuff(hash("jinxqramp"))) {
-            rev_stacks = g_LocalPlayer->GetBuff(hash("jinxqramp")).Count; }
+        if(g_LocalPlayer->HasBuff("jinxqramp")) {
+            rev_stacks = g_LocalPlayer->GetBuff("jinxqramp").Count; }
 
         // combo rocket -> minigun (combo)
         if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
             if(g_LocalPlayer->Level() >= Menu["jinx.use.q.splash3"]->GetInt()) {
                 // q splash mania
-                if(g_LocalPlayer->HasBuff(hash("jinxpassivekillmovementspeed")) && Menu["jinx.use.q.splash"]->GetBool()) {
+                if(g_LocalPlayer->HasBuff("jinxpassivekillmovementspeed") && Menu["jinx.use.q.splash"]->GetBool()) {
                     if(mana_cap >= ManaScenario::Medium && args->Target->CountMyEnemiesInRange(q_splash_range()) >= 2) {
                         // don't switch
                         return; } }
 
                 // q splash pow pow
-                if(g_LocalPlayer->HasBuff(hash("jinxqramp")) && Menu["jinx.use.q.splash2"]->GetBool()) {
+                if(g_LocalPlayer->HasBuff("jinxqramp") && Menu["jinx.use.q.splash2"]->GetBool()) {
                     if(rev_stacks == 3) {
                         if(mana_cap >= ManaScenario::Medium && args->Target->CountMyEnemiesInRange(q_splash_range()) >= 2) {
                             // don't switch
@@ -372,7 +372,7 @@ inline void EzJinx::on_before_attack(BeforeAttackOrbwalkerArgs * args) {
                         return; } } // q splash pow pow
 
                 if(g_LocalPlayer->Level() >= Menu["jinx.use.q.splash3"]->GetInt()) {
-                    if(g_LocalPlayer->HasBuff(hash("jinxqramp")) && Menu["jinx.use.q.splash4"]->GetBool()) {
+                    if(g_LocalPlayer->HasBuff("jinxqramp") && Menu["jinx.use.q.splash4"]->GetBool()) {
                         if(rev_stacks == 3) {
                             if(mana_cap >= ManaScenario::Medium && args->Target->CountMyEnemiesInRange(q_splash_range()) >= 2) {
                                 // don't switch
@@ -397,7 +397,7 @@ inline void EzJinx::on_before_attack(BeforeAttackOrbwalkerArgs * args) {
 
                 // q splash pow pow
                 if(g_LocalPlayer->Level() >= Menu["jinx.use.q.splash3"]->GetInt()) {
-                    if(g_LocalPlayer->HasBuff(hash("jinxqramp")) && Menu["jinx.use.q.splash4"]->GetBool()) {
+                    if(g_LocalPlayer->HasBuff("jinxqramp") && Menu["jinx.use.q.splash4"]->GetBool()) {
                         if(rev_stacks == 3) {
                             if(mana_cap >= ManaScenario::Medium && args->Target->CountMyEnemiesInRange(q_splash_range()) >= 2) {
                                 // don't switch
@@ -427,7 +427,7 @@ inline void EzJinx::on_before_attack(BeforeAttackOrbwalkerArgs * args) {
 
 inline void EzJinx::on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) {
     if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeFarm)) {
-        if(g_LocalPlayer->HasBuff(hash("jinxq"))) {
+        if(g_LocalPlayer->HasBuff("jinxq")) {
             if(unit->IsMe() && args->IsAutoAttack) {
                 if(Spells["jinx.q"]->IsReady()) {
                     Spells["jinx.q"]->Cast(); } } } } }

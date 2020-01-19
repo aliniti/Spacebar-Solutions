@@ -93,7 +93,7 @@ inline void EzTristana::on_update() {
         const auto target = g_Common->GetTarget(g_LocalPlayer->AttackRange() + g_LocalPlayer->BoundingRadius(), DamageType::Physical);
 
         if(target != nullptr && target->IsValidTarget() && g_LocalPlayer->IsInAutoAttackRange(target)) {
-            if(target->HasBuff(hash("tristanaechargesound")) && Menu["tristana.focus.e.target"]->GetBool()) {
+            if(target->HasBuff("tristanaechargesound") && Menu["tristana.focus.e.target"]->GetBool()) {
                 g_Orbwalker->SetOrbwalkingTarget(target); }
 
             if(Spells["tristana.q"]->IsReady() && Menu["tristana.use.q"]->GetBool()) {
@@ -111,7 +111,7 @@ inline void EzTristana::on_update() {
         if(g_LocalPlayer->ManaPercent() > 70) {
             if(target != nullptr && target->IsValidTarget() && g_LocalPlayer->IsInAutoAttackRange(target)) {
                 if(Menu[target->ChampionName().append("harass.enable")]->GetBool()) {
-                    if(target->HasBuff(hash("tristanaechargesound")) && Menu["tristana.focus.e.target"]->GetBool()) {
+                    if(target->HasBuff("tristanaechargesound") && Menu["tristana.focus.e.target"]->GetBool()) {
                         g_Orbwalker->SetOrbwalkingTarget(target); }
 
                     if(Spells["tristana.q"]->IsReady() && Menu["tristana.use.q.h"]->GetBool()) {
@@ -131,7 +131,7 @@ inline void EzTristana::on_update() {
 
                 for(auto m : big_mobs) {
                     if(m != nullptr && m->IsValidTarget() && g_LocalPlayer->IsInAutoAttackRange(m)) {
-                        if(m->HasBuff(hash("tristanaechargesound")) && Menu["tristana.focus.e.target"]->GetBool()) {
+                        if(m->HasBuff("tristanaechargesound") && Menu["tristana.focus.e.target"]->GetBool()) {
                             g_Orbwalker->SetOrbwalkingTarget(m); }
 
                         if(Menu["tristana.use.e.f"]->GetBool() && Spells["tristana.e"]->IsReady()) {
@@ -147,7 +147,7 @@ inline void EzTristana::on_update() {
 
                 for(auto m : creeps) {
                     if(m != nullptr && m->IsValidTarget() && g_LocalPlayer->IsInAutoAttackRange(m)) {
-                        if(m->HasBuff(hash("tristanaechargesound")) && Menu["tristana.focus.e.target"]->GetBool()) {
+                        if(m->HasBuff("tristanaechargesound") && Menu["tristana.focus.e.target"]->GetBool()) {
                             g_Orbwalker->SetOrbwalkingTarget(m); }
 
                         if(Menu["tristana.use.e.f"]->GetBool() && Spells["tristana.e"]->IsReady()) {
@@ -186,10 +186,10 @@ inline void EzTristana::on_huddraw() {
         g_Drawing->AddFilledRectOnScreen(g_LocalPlayer->HealthBarPosition(), Vector2(10, 10), Menu["tristana.draww.hp"]->GetColor()); } }
 
 inline float EzTristana::edmg(IGameObject * unit) {
-    if(!unit->HasBuff(hash("tristanaechargesound")) || !Menu["tristana.use.er.finish"]->GetBool()) {
+    if(!unit->HasBuff("tristanaechargesound") || !Menu["tristana.use.er.finish"]->GetBool()) {
         return 0; }
 
-    auto multiplier = unit->HasBuff(hash("tristanaecharge")) ? unit->GetBuff(hash("tristanaecharge")).Count + 1 : 1;
+    auto multiplier = unit->HasBuff("tristanaecharge") ? unit->GetBuff("tristanaecharge").Count + 1 : 1;
 
     if(multiplier < Menu["tristana.use.er.min.stacks"]->GetInt()) {
         return 0; }
