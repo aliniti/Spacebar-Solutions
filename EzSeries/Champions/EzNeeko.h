@@ -5,7 +5,7 @@
 class EzNeeko : public EzChampion {
     public:
 
-        static auto on_boot(IMenu * menu)->IMenu*;
+        static auto on_boot(IMenu * menu) -> IMenu*;
         static auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void;
         static void on_draw();
         static void on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args);
@@ -13,7 +13,6 @@ class EzNeeko : public EzChampion {
         static void on_cast(IGameObject * unit, OnProcessSpellEventArgs * args); };
 
 inline auto EzNeeko::on_boot(IMenu * menu) -> IMenu * {
-
     auto c_menu = menu->AddSubMenu("Neeko: Core", "neeko.core");
     Menu["neeko.use.q"] = c_menu->AddCheckBox("Use (Q)", "neeko.use.q", true);
     Menu["neeko.use.q2"] = c_menu->AddCheckBox("-> Only Immobile", "neeko.use.q2", true);
@@ -45,7 +44,6 @@ inline auto EzNeeko::on_boot(IMenu * menu) -> IMenu * {
 inline auto EzNeeko::on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void {}
 
 inline void EzNeeko::on_draw() {
-
     if(Menu["neeko.draw.q"]->GetBool()) {
         g_Drawing->AddCircle(g_LocalPlayer->Position(), Spells["neeko.q"]->Range(), RGBA(204, 102, 204, 115)); }
 
@@ -105,7 +103,6 @@ inline void EzNeeko::on_update() {
 
             if(target != nullptr && target->IsValidTarget()) {
                 if(!g_LocalPlayer->IsInAutoAttackRange(target) || target->HasCC()) {
-
                     const auto pred = Ex->get_prediction(Spells["neeko.q"], target);
 
                     if(!target->HasCC() && Menu["neeko.use.q2"]->GetBool()) {

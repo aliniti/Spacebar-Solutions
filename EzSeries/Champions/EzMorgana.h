@@ -5,7 +5,7 @@
 class EzMorgana : public EzChampion {
     public:
 
-        static auto on_boot(IMenu * menu)->IMenu*;
+        static auto on_boot(IMenu * menu) -> IMenu*;
         static auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void;
         static auto on_draw() -> void;
         static auto on_create(IGameObject * obj) -> void;
@@ -15,19 +15,18 @@ class EzMorgana : public EzChampion {
         static void on_cast(IGameObject * unit, OnProcessSpellEventArgs * args); };
 
 inline auto EzMorgana::on_boot(IMenu * menu) -> IMenu * {
+    auto d_menu = menu->AddSubMenu("Morgana: Draw", "morgana.draw");
+    Menu["morgana.draw.q"] = d_menu->AddCheckBox("Draw Dark Binding (Q)", "morgana.draw.q", true);
+    Menu["morgana.draw.w"] = d_menu->AddCheckBox("Draw Tormented Shadow (W)", "morgana.draw.w", true);
+    Menu["morgana.draw.e"] = d_menu->AddCheckBox("Draw Black Shield (E)", "morgana.draw.e", true);
+    Menu["morgana.draw.r"] = d_menu->AddCheckBox("Draw Soul Shackles (R)", "morgana.draw.r", true);
 
-	auto d_menu = menu->AddSubMenu("Morgana: Draw", "morgana.draw");
-	Menu["morgana.draw.q"] = d_menu->AddCheckBox("Draw Dark Binding (Q)", "morgana.draw.q", true);
-	Menu["morgana.draw.w"] = d_menu->AddCheckBox("Draw Tormented Shadow (W)", "morgana.draw.w", true);
-	Menu["morgana.draw.e"] = d_menu->AddCheckBox("Draw Black Shield (E)", "morgana.draw.e", true);
-	Menu["morgana.draw.r"] = d_menu->AddCheckBox("Draw Soul Shackles (R)", "morgana.draw.r", true);
-	
     Menu["morgana.use.q"] = menu->AddCheckBox("Use Dark Binding (Q)", "morgana.use.q", true);
     Menu["morgana.use.w"] = menu->AddCheckBox("Use Tormented Shadow (W)", "morgana.use.w", true);
     Menu["morgana.use.e"] = menu->AddCheckBox("Use Black Shield (E)", "morgana.use.e", true);
     Menu["morgana.use.r"] = menu->AddCheckBox("Use (R)", "morgana.use.r", true);
 
-	menu->AddLabel("Mechanics:", "morg.mech");
+    menu->AddLabel("Mechanics:", "morg.mech");
     Menu["morgana.use.fastw"] = menu->AddCheckBox("Use Fast (W)", "morgana.use.fastw", false);
     Menu["morgana.use.w2"] = menu->AddCheckBox("Use (W) Only Immobile", "morgana.use.w2", true);
 
@@ -59,7 +58,6 @@ inline auto EzMorgana::on_boot(IMenu * menu) -> IMenu * {
 inline auto EzMorgana::on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void {}
 
 inline void EzMorgana::on_draw() {
-
     if(Menu["morgana.draw.q"]->GetBool()) {
         g_Drawing->AddCircle(g_LocalPlayer->Position(), Spells["morgana.q"]->Range(), RGBA(204, 102, 204, 115)); }
 
@@ -74,39 +72,24 @@ inline void EzMorgana::on_draw() {
 
 
 inline void EzMorgana::on_create(IGameObject * obj) {
-	if (obj != nullptr && obj->IsMissileClient() && Menu["morgana.use.e.missile"]->GetBool())
-	{
-		if (!obj->IsValid() || obj->MissileSender() == nullptr)
-		{
-			return;
-		}
+    if(obj != nullptr && obj->IsMissileClient() && Menu["morgana.use.e.missile"]->GetBool()) {
+        if(!obj->IsValid() || obj->MissileSender() == nullptr) {
+            return; }
 
-		if (!obj->MissileSender()->IsAIHero() || !obj->MissileSender()->IsEnemy())
-		{
-			return;
-		}
-	
-		if (Spells["morgana.e"]->IsReady() && Menu["morgana.use.e"]->GetBool()) {
-			for (auto hero : g_ObjectManager->GetChampions()) {
-				auto proj = hero->ServerPosition().ProjectOn(obj->MissileStartPosition(), obj->MissileEndPosition());
+        if(!obj->MissileSender()->IsAIHero() || !obj->MissileSender()->IsEnemy()) {
+            return; }
 
-				if (hero->IsAlly() && Menu[hero->ChampionName().append("shield.enable")]->GetBool()) {
+        if(Spells["morgana.e"]->IsReady() && Menu["morgana.use.e"]->GetBool()) {
+            for(auto hero : g_ObjectManager->GetChampions()) {
+                auto proj = hero->ServerPosition().ProjectOn(obj->MissileStartPosition(), obj->MissileEndPosition());
 
-					if (hero->IsValidTarget(Spells["morgana.e"]->Range(), false)) {
-
-						if (proj.IsOnSegment && hero->Distance(proj.SegmentPoint) <= obj->MissileSpellData().LineWidth + hero->BoundingRadius()) {
-							Spells["morgana.e"]->Cast(hero);
-						}
-					}
-				}
-			}
-		}
-	}
-}
+                if(hero->IsAlly() && Menu[hero->ChampionName().append("shield.enable")]->GetBool()) {
+                    if(hero->IsValidTarget(Spells["morgana.e"]->Range(), false)) {
+                        if(proj.IsOnSegment && hero->Distance(proj.SegmentPoint) <= obj->MissileSpellData().LineWidth + hero->BoundingRadius()) {
+                            Spells["morgana.e"]->Cast(hero); } } } } } } }
 
 inline void EzMorgana::on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) {
     if(Menu["morgana.use.e.spell"] && unit->IsAIHero() && unit->IsEnemy()) {
-
         if(g_LocalPlayer->ManaPercent() < Menu["morgana.use.e.mana"]->GetInt()) {
             return; }
 
@@ -114,22 +97,16 @@ inline void EzMorgana::on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * 
             for(auto hero : g_ObjectManager->GetChampions()) {
                 if(hero->IsAlly() && Menu[hero->ChampionName().append("shield.enable")]->GetBool()) {
                     if(hero->IsValidTarget(Spells["morgana.e"]->Range(), false)) {
-
-                    	if(args->SpellData->TargetingType == SpellTargeting::Target && Menu["morgana.use.e.t"]->GetBool())
-                    	{
-                    		if (args->Target && args->Target->IsAIHero())
-                    		{
-								Spells["morgana.e"]->Cast(hero);
-                    		}
-                    	}
+                        if(args->SpellData->TargetingType == SpellTargeting::Target && Menu["morgana.use.e.t"]->GetBool()) {
+                            if(args->Target && args->Target->IsAIHero()) {
+                                Spells["morgana.e"]->Cast(hero); } }
 
                         if(args->SpellData->TargetingType == SpellTargeting::Area && Menu["morgana.use.e.cs"]->GetBool()) {
-							auto end = args->EndPosition;
-                        	if (unit->ServerPosition().Distance(args->EndPosition) > args->SpellData->CastRange[0])
-                        	{
-								end = unit->ServerPosition() + (args->EndPosition - unit->ServerPosition()).Normalized() * args->SpellData->CastRange[0];
-                        	}
-                       	
+                            auto end = args->EndPosition;
+
+                            if(unit->ServerPosition().Distance(args->EndPosition) > args->SpellData->CastRange[0]) {
+                                end = unit->ServerPosition() + (args->EndPosition - unit->ServerPosition()).Normalized() * args->SpellData->CastRange[0]; }
+
                             if(hero->Distance(end) <= args->SpellData->CastRadius[0]) {
                                 Spells["morgana.e"]->Cast(hero); } }
 
@@ -172,27 +149,17 @@ inline void EzMorgana::on_post_update() {
                     Spells["morgana.q"]->FastCast(pred.CastPosition); } } } } }
 
 inline void EzMorgana::on_update() {
+    if(Menu["morgana.use.r"]->GetBool() && Spells["morgana.r"]->IsReady()) {
+        if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
+            auto r_target = g_Common->GetTarget(Spells["morgana.r"]->Range(), DamageType::Magical);
 
-	if (Menu["morgana.use.r"]->GetBool() && Spells["morgana.r"]->IsReady())
-	{
-		if (g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo))
-		{
-			auto r_target = g_Common->GetTarget(Spells["morgana.r"]->Range(), DamageType::Magical);
-			if (r_target && r_target->IsValidTarget())
-			{
-				if (Ex->has_cc(r_target))
-				{
-					Spells["morgana.r"]->Cast();
-				}
-			}
-		}
-		
-		if (g_LocalPlayer->CountEnemiesInRange(Spells["morgana.r"]->Range()) >= 3)
-		{
-			Spells["morgana.r"]->Cast();
-		}		
-	}
-	
+            if(r_target && r_target->IsValidTarget()) {
+                if(Ex->has_cc(r_target)) {
+                    Spells["morgana.r"]->Cast(); } } }
+
+        if(g_LocalPlayer->CountEnemiesInRange(Spells["morgana.r"]->Range()) >= 3) {
+            Spells["morgana.r"]->Cast(); } }
+
     if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
         if(Menu["morgana.use.q"]->GetBool() && Spells["morgana.q"]->IsReady()) {
             auto target = g_Common->GetTarget(Spells["morgana.q"]->Range(), DamageType::Magical);
@@ -215,7 +182,4 @@ inline void EzMorgana::on_update() {
 
     on_post_update(); }
 
-inline void EzMorgana::on_cast(IGameObject * unit, OnProcessSpellEventArgs * args)
-{
-	
-}
+inline void EzMorgana::on_cast(IGameObject * unit, OnProcessSpellEventArgs * args) {}

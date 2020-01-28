@@ -193,14 +193,13 @@ inline auto EzExtensions::is_plant(IGameObject * unit) -> bool {
     return strstr(unit->Name().c_str(), "Plant"); }
 
 inline auto EzExtensions::get_real_position(float delay) -> Vector {
-
     auto path = g_LocalPlayer->Path();
 
     if(path.size() < 1) {
         return g_LocalPlayer->ServerPosition(); }
 
     auto dir = (path[0] - g_LocalPlayer->ServerPosition()).Normalized();
-    return  g_LocalPlayer->ServerPosition() + dir * g_LocalPlayer->MoveSpeed() * (delay / 1000); }
+    return g_LocalPlayer->ServerPosition() + dir * g_LocalPlayer->MoveSpeed() * (delay / 1000); }
 
 inline auto EzExtensions::check_path_collision(IGameObject * unit, Vector pos) {
     auto path = g_LocalPlayer->CreatePath(g_LocalPlayer->ServerPosition(), pos);
@@ -221,7 +220,7 @@ inline auto EzExtensions::get_near_wall_point(Vector start, Vector end) -> Vecto
         if(v.IsWall()) {
             return v; } }
 
-    return { 0, 0, 0 }; }
+    return {0, 0, 0 }; }
 
 inline auto EzExtensions::check_point_collision(IGameObject * unit, Vector pos) -> bool {
     auto path = unit->CreatePath(pos);
@@ -233,7 +232,6 @@ inline auto EzExtensions::check_point_collision(IGameObject * unit, Vector pos) 
     return false; }
 
 inline auto EzExtensions::get_surrounding_positions(Vector v, float posRadius, int maxPosChecked) -> std::vector<Vector> {
-
     auto pos_checked = 0;
     auto radius_index = 0;
     auto possible_positions = std::vector<Vector>();
@@ -255,9 +253,3 @@ inline auto EzExtensions::get_surrounding_positions(Vector v, float posRadius, i
             possible_positions.push_back(c_circle); } }
 
     return possible_positions; }
-
-
-
-
-
-

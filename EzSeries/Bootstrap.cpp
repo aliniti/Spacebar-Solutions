@@ -177,7 +177,6 @@ auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
         default: ; } }
 
 auto build_menu(IMenu * menu) -> IMenu * {
-
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana:
             return EzTristana::on_boot(menu);
