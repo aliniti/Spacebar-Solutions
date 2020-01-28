@@ -29,8 +29,8 @@ inline auto EzNeeko::on_boot(IMenu * menu) -> IMenu * {
     Menu["neeko.use.fastq"] = menu->AddCheckBox("Use Fast (Q)", "neeko.use.fastq", false);
 
     menu->AddLabel("Neeko: Auto", "neeko.auto");
-    Menu["neeko.auto.q"] = menu->AddCheckBox("Auto (Q) (Immobile)", "neeko.auto.q", true);
-    Menu["neeko.auto.e"] = menu->AddCheckBox("Auto (E) (Immobile)", "neeko.auto.e", true);
+    Menu["neeko.auto.q"] = menu->AddCheckBox("Use (Q) Immobile", "neeko.auto.q", true);
+    Menu["neeko.auto.e"] = menu->AddCheckBox("Use (E) Immobile", "neeko.auto.e", true);
 
     Spells["neeko.q"] = g_Common->AddSpell(SpellSlot::Q, 800);
     Spells["neeko.q"]->SetSkillshot(0.25f, 225, 500, kCollidesWithNothing, kSkillshotCircle);

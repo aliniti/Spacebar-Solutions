@@ -25,6 +25,7 @@ class EzExtensions {
         static auto project_on_path(Vector start, Vector end, float width, float range, std::vector<IGameObject *> & units, bool minion) -> int;
 
         static auto draw_dmg_hpbar(IGameObject * unit, double damage, const char * text, DWORD color) -> void;
+        static auto has_cc(IGameObject * unit);
         static auto is_plant(IGameObject * unit) -> bool;
         static auto get_real_position(float delay) -> Vector;
         static auto check_path_collision(IGameObject * unit, Vector pos);
@@ -181,6 +182,12 @@ inline auto EzExtensions::draw_dmg_hpbar(IGameObject * unit, double damage, cons
     g_Drawing->AddLine(xd1, xd2, color);
     g_Drawing->AddLine(xd1, xd1 + Vector(0, 8), color);
     g_Drawing->AddText(xd2 - Vector(13, 13), color, 3, text); }
+
+inline auto EzExtensions::has_cc(IGameObject * unit) {
+    return unit->HasBuffOfType(BuffType::Knockup) || unit->HasBuffOfType(BuffType::Stun)
+        || unit->HasBuffOfType(BuffType::Sleep) || unit->HasBuffOfType(BuffType::Snare)
+        || unit->HasBuffOfType(BuffType::Stun) || unit->HasBuffOfType(BuffType::Suppression)
+        || unit->HasBuffOfType(BuffType::Taunt); }
 
 inline auto EzExtensions::is_plant(IGameObject * unit) -> bool {
     return strstr(unit->Name().c_str(), "Plant"); }

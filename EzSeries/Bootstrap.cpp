@@ -3,8 +3,8 @@
 #include "Champions/EzTristana.h"
 #include "Champions/EzJinx.h"
 #include "Champions/EzKatarina.h"
-#include "Champions/EzVayne.h"
 #include "Champions/EzNeeko.h"
+#include "Champions/EzMorgana.h"
 
 // oh dis...
 PLUGIN_API const char PLUGIN_PRINT_NAME[32] = "EzSeries";
@@ -36,9 +36,6 @@ auto on_create(IGameObject * unit) -> void {
         case ChampionId::Katarina:
             return EzKatarina::on_create(unit);
 
-        case ChampionId::Ornn:
-            return EzVayne::on_create(unit);
-
         default: ; } }
 
 auto on_delete(IGameObject * unit) -> void {
@@ -65,11 +62,11 @@ auto on_update() -> void {
         case ChampionId::Katarina:
             return EzKatarina::on_update();
 
-        case ChampionId::Vayne:
-            return EzVayne::on_update();
-
         case ChampionId::Neeko:
             return EzNeeko::on_update();
+
+        case ChampionId::Morgana:
+            return EzMorgana::on_update();
 
         default: ; } }
 
@@ -88,11 +85,11 @@ auto on_draw() -> void {
         case ChampionId::Katarina:
             return EzKatarina::on_hud_draw();
 
-        case ChampionId::Vayne:
-            return EzVayne::on_draw();
-
         case ChampionId::Neeko:
             return EzNeeko::on_draw();
+
+        case ChampionId::Morgana:
+            return EzMorgana::on_draw();
 
         default: ; } }
 
@@ -110,9 +107,6 @@ auto hpbarfill_render() -> void {
         case ChampionId::Katarina:
             return EzKatarina::hpbarfill_render();
 
-        case ChampionId::Vayne:
-            return EzVayne::hpbarfill_render();
-
         default: ; } }
 
 auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void {
@@ -123,11 +117,11 @@ auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void {
         case ChampionId::Jinx:
             return EzJinx::on_buff(unit, args);
 
-        case ChampionId::Vayne:
-            return EzVayne::on_buff(unit, args);
-
         case ChampionId::Neeko:
             return EzNeeko::on_buff(unit, args);
+
+        case ChampionId::Morgana:
+            return EzMorgana::on_buff(unit, args);
 
         default: ; } }
 
@@ -171,18 +165,19 @@ auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void {
         case ChampionId::Jinx:
             return EzJinx::on_do_cast(unit, args);
 
-        case ChampionId::Vayne:
-            return EzVayne::on_do_cast(unit, args);
-
         case ChampionId::Katarina:
             return EzKatarina::on_do_cast(unit, args);
 
         case ChampionId::Neeko:
             return EzNeeko::on_do_cast(unit, args);
 
+        case ChampionId::Morgana:
+            return EzMorgana::on_do_cast(unit, args);
+
         default: ; } }
 
 auto build_menu(IMenu * menu) -> IMenu * {
+
     switch(g_LocalPlayer->ChampionId()) {
         case ChampionId::Tristana:
             return EzTristana::on_boot(menu);
@@ -193,11 +188,11 @@ auto build_menu(IMenu * menu) -> IMenu * {
         case ChampionId::Katarina:
             return EzKatarina::on_boot(menu);
 
-        case ChampionId::Vayne:
-            return EzVayne::on_boot(menu);
-
         case ChampionId::Neeko:
             return EzNeeko::on_boot(menu);
+
+        case ChampionId::Morgana:
+            return EzMorgana::on_boot(menu);
 
         default: {
                 g_Common->ChatPrint(R"(<font color="#CC6666"><b>[EzSeries]:</b></font><b><font color="#99FF99"> Not Supported!</font>)"); } } }
