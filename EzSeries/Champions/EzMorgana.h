@@ -4,7 +4,6 @@
 
 class EzMorgana : public EzChampion {
     public:
-
         static auto on_boot(IMenu * menu) -> IMenu*;
         static auto on_buff(IGameObject * unit, OnBuffEventArgs * args) -> void;
         static auto on_draw() -> void;
@@ -21,30 +20,32 @@ inline auto EzMorgana::on_boot(IMenu * menu) -> IMenu * {
     Menu["morgana.draw.e"] = d_menu->AddCheckBox("Draw Black Shield (E)", "morgana.draw.e", true);
     Menu["morgana.draw.r"] = d_menu->AddCheckBox("Draw Soul Shackles (R)", "morgana.draw.r", true);
 
+    auto s_menu = menu->AddSubMenu("Morgana: BlackShield", "morgana.shield");
+    auto um_menu = s_menu->AddSubMenu("Enabled Heroes", "enabled.champs");
+
+    for(auto i : g_ObjectManager->GetByType(EntityType::AIHeroClient)) {
+        if(i->IsAlly()) {
+            Menu[i->ChampionName().append("shield.enable")] = um_menu->AddCheckBox("Shield -> " + i->ChampionName(),
+                    i->ChampionName().append("shield.enable"), true); } }
+
+    Menu["morgana.use.e.mana"] = s_menu->AddSlider("Minimum Mana (%)", "morgana.use.e.mana", 55, 0, 100);
+    Menu["morgana.use.e.t"] = s_menu->AddCheckBox("Targeted Spells", "morgana.use.e.t", true);
+    Menu["morgana.use.e.s"] = s_menu->AddCheckBox("Line Spells", "morgana.use.e.s", true);
+    Menu["morgana.use.e.cs"] = s_menu->AddCheckBox("AoE Spells", "morgana.use.e.cs", true);
+    Menu["morgana.use.e.missile"] = s_menu->AddCheckBox("Missiles", "morgana.use.e.missile", true);
+
     Menu["morgana.use.q"] = menu->AddCheckBox("Use Dark Binding (Q)", "morgana.use.q", true);
     Menu["morgana.use.w"] = menu->AddCheckBox("Use Tormented Shadow (W)", "morgana.use.w", true);
     Menu["morgana.use.e"] = menu->AddCheckBox("Use Black Shield (E)", "morgana.use.e", true);
-    Menu["morgana.use.r"] = menu->AddCheckBox("Use (R)", "morgana.use.r", true);
+    Menu["morgana.use.r"] = menu->AddCheckBox("Use Soul Shackles (R)", "morgana.use.r", true);
 
     menu->AddLabel("Mechanics:", "morg.mech");
     Menu["morgana.use.fastw"] = menu->AddCheckBox("Use Fast (W)", "morgana.use.fastw", false);
     Menu["morgana.use.w2"] = menu->AddCheckBox("Use (W) Only Immobile", "morgana.use.w2", true);
 
-    auto s_menu = menu->AddSubMenu("Morgana: BlackShield", "morgana.shield");
-    Menu["morgana.use.e.mana"] = s_menu->AddSlider("Minimum Mana (%)", "morgana.use.e.mana", 55, 0, 100);
-    Menu["morgana.use.e.t"] = s_menu->AddCheckBox("Shield Targeted Spells", "morgana.use.e.t", true);
-    Menu["morgana.use.e.s"] = s_menu->AddCheckBox("Shield Line Spells", "morgana.use.e.s", true);
-    Menu["morgana.use.e.cs"] = s_menu->AddCheckBox("Shield Circle Spells", "morgana.use.e.cs", true);
-    Menu["morgana.use.e.missile"] = s_menu->AddCheckBox("Shield Missiles", "morgana.use.e.missile", true);
-
-    for(auto i : g_ObjectManager->GetByType(EntityType::AIHeroClient)) {
-        if(i->IsAlly()) {
-            Menu[i->ChampionName().append("shield.enable")] = s_menu->AddCheckBox("Shield " + i->ChampionName(),
-                    i->ChampionName().append("shield.enable"), true); } }
-
-    auto a_menu = menu->AddSubMenu("Morgana: Auto", "morgana.auto");
-    Menu["morgana.auto.q"] = a_menu->AddCheckBox("Use (Q) Immobile", "morgana.auto.q", true);
-    Menu["morgana.auto.w"] = a_menu->AddCheckBox("Use (W) Immobile", "morgana.auto.w", true);
+    menu->AddLabel("Morgana: Auto", "morgana.auto");
+    Menu["morgana.auto.q"] = menu->AddCheckBox("Use (Q) Immobile", "morgana.auto.q", true);
+    Menu["morgana.auto.w"] = menu->AddCheckBox("Use (W) Immobile", "morgana.auto.w", true);
 
     Spells["morgana.q"] = g_Common->AddSpell(SpellSlot::Q, 1175);
     Spells["morgana.q"]->SetSkillshot(0.25f, 225, 1200, kCollidesWithHeroes | kCollidesWithMinions, kSkillshotLine);
@@ -97,8 +98,9 @@ inline void EzMorgana::on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * 
             for(auto hero : g_ObjectManager->GetChampions()) {
                 if(hero->IsAlly() && Menu[hero->ChampionName().append("shield.enable")]->GetBool()) {
                     if(hero->IsValidTarget(Spells["morgana.e"]->Range(), false)) {
+
                         if(args->SpellData->TargetingType == SpellTargeting::Target && Menu["morgana.use.e.t"]->GetBool()) {
-                            if(args->Target && args->Target->IsAIHero()) {
+                            if(args->Target->NetworkId() == hero->NetworkId()) {
                                 Spells["morgana.e"]->Cast(hero); } }
 
                         if(args->SpellData->TargetingType == SpellTargeting::Area && Menu["morgana.use.e.cs"]->GetBool()) {

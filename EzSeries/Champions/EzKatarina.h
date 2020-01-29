@@ -11,6 +11,7 @@ class EzKatarina : public EzChampion {
         static auto on_post_update() -> void;
         static auto on_hud_draw() -> void;
         static auto hpbarfill_render() -> void;
+        static auto can_execute(IGameObject * unit) -> bool;
 
         static std::map<float, Vector> blade_vectors;
         static std::map<float, IGameObject *> all_blades;
@@ -19,10 +20,11 @@ class EzKatarina : public EzChampion {
         static auto dynamic_range() -> float;
         static auto on_create(IGameObject * unit) -> void;
         static auto on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) -> void;
-        static auto blade_dmg(IGameObject * unit) -> float;
+        static auto w_dmg(IGameObject * unit) -> float;
         static auto ult_dmg(IGameObject * unit, int channel_time = 2.5) -> float;
+        static float q_dmg(IGameObject * unit);
         static auto e_dmg(IGameObject * unit) -> float;
-        static auto item_dmg(IGameObject * unit) -> float; };
+        static auto gunblade_dmg(IGameObject * unit) -> float; };
 
 
 std::map<float, Vector> EzKatarina::blade_vectors;
@@ -60,25 +62,17 @@ inline auto EzKatarina::on_issue_order(IGameObject * unit, OnIssueOrderEventArgs
 inline auto EzKatarina::on_pre_update() -> void {
     if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
         // - shunpo target if enough damage hopefully?
-        if(Spells["katarina.e"]->IsReady() && Menu["katarina.use.e"]->GetBool()) {
-            for(auto target : g_ObjectManager->GetChampions()) {
-                // todo: more or different logic on this later xd
-                if(target != nullptr && target->IsValidTarget()) {
-                    if(e_dmg(target) >= target->RealHealth(true, true)) {
-                        // - find a shunpo position
-                        const auto position = shunpo_position(target, true);
 
-                        if(position.IsValid()) {
-                            if(Spells["katarina.e"]->FastCast(position)) {
-                                g_Orbwalker->ResetAA(); } } }
+        for(auto target : g_ObjectManager->GetChampions()) {
+            // todo: more or different logic on this later xd
 
-                    if(blade_dmg(target) >= target->RealHealth(true, true)) {
-                        // - find a shunpo position
-                        const auto position = shunpo_position(target, true);
+            if(target != nullptr && target->IsValidTarget()) {
+                if(can_execute(target)) {
+                    if(g_LocalPlayer->HasBuff("katarinarsound")) {
+                        const auto p = g_LocalPlayer->ServerPosition().Extend(target->ServerPosition(), 10);
+                        g_LocalPlayer->IssueOrder(IssueOrderType::MoveTo, p, false);
 
-                        if(position.IsValid()) {
-                            if(Spells["katarina.e"]->FastCast(position)) {
-                                g_Orbwalker->ResetAA(); } } } } } } } }
+                        return; } } } } } }
 
 inline auto EzKatarina::on_post_update() -> void {
     // - dagger handling
@@ -215,8 +209,12 @@ inline void EzKatarina::hpbarfill_render() {
 
     for(auto i : g_ObjectManager->GetChampions()) {
         if(i != nullptr && !i->IsDead() && i->IsVisibleOnScreen() && !i->IsMe() && i->IsValidTarget()) {
-            Ex->draw_dmg_hpbar(i, ult_dmg(i, 2) + blade_dmg(i),
+            Ex->draw_dmg_hpbar(i, ult_dmg(i, 2) + w_dmg(i),
                 "", Menu["katarina.xdraw.x1"]->GetColor()); } } }
+
+inline auto EzKatarina::can_execute(IGameObject * unit) -> bool {
+    return q_dmg(unit) + w_dmg(unit) + e_dmg(unit) + gunblade_dmg(unit) +
+        g_LocalPlayer->AutoAttackDamage(unit, true) >= unit->RealHealth(true, true); }
 
 inline auto EzKatarina::shunpo_position(IGameObject * unitNear, bool channeling) -> Vector {
     if(unitNear == nullptr || !unitNear->IsValidTarget()) {
@@ -229,7 +227,7 @@ inline auto EzKatarina::shunpo_position(IGameObject * unitNear, bool channeling)
         if(unitNear->Distance(blade) <= Spells["katarina.w"]->Range() + unitNear->BoundingRadius()
             && blade->Distance(g_LocalPlayer) <= Spells["katarina.e"]->Range() + Spells["katarina.w"]->Range()) {
             if(blade->Distance(g_LocalPlayer) > Spells["katarina.w"]->Range() - 75 ||
-                channeling && g_LocalPlayer->HealthPercent() < 50) {
+                channeling && can_execute(unitNear)) {
                 return blade->ServerPosition(); } } }
 
     return unitNear->ServerPosition() + (g_LocalPlayer->ServerPosition() - unitNear->ServerPosition()).Normalized() * 135; }
@@ -273,11 +271,12 @@ inline auto EzKatarina::on_do_cast(IGameObject * unit, OnProcessSpellEventArgs *
             if(args->Target != nullptr && args->Target->IsValidTarget() && args->Target->IsAIHero()) {
                 Spells["katarina.q"]->Cast(args->Target); } } } }
 
-inline auto EzKatarina::blade_dmg(IGameObject * unit) -> float {
+inline auto EzKatarina::w_dmg(IGameObject * unit) -> float {
+
     auto dmg = 0;
 
     if(unit == nullptr || !unit->IsValidTarget()) {
-        return 0; }
+        return dmg; }
 
     const auto base_blade_dmg = std::vector<int> {
         68, 72, 77, 82, 89, 96, 103, 112, 121, 131, 142, 154,
@@ -292,15 +291,19 @@ inline auto EzKatarina::blade_dmg(IGameObject * unit) -> float {
         auto key = b.first;
         auto blade = b.second;
 
-        if(unit->Distance(blade) <= Spells["katarina.w"]->Range() + unit->BoundingRadius()
-            && blade->Distance(g_LocalPlayer) <= Spells["katarina.e"]->Range() + Spells["katarina.w"]->Range()) {
-            if(blade->Distance(g_LocalPlayer) > Spells["katarina.w"]->Range() - 75) {
-                dmg += damage; } } }
+        if(unit->Distance(blade) <= Spells["katarina.w"]->Range() + unit->BoundingRadius()) {
+            if(Spells["katarina.e"]->IsReady()) {
+                if(blade->Distance(g_LocalPlayer) <= Spells["katarina.e"]->Range() + Spells["katarina.w"]->Range()) {
+                    dmg += damage; } }
+
+            else {
+                if(blade->Distance(g_LocalPlayer) <= Spells["katarina.w"]->Range()) {
+                    dmg += damage; } } } }
 
     return dmg; }
 
 inline auto EzKatarina::ult_dmg(IGameObject * unit, int channel_time) -> float {
-    if(unit == nullptr || !unit->IsValidTarget()) {
+    if(unit == nullptr || !unit->IsValidTarget() || !Spells["katarina.r"]->IsReady()) {
         return 0; }
 
     const auto dagger_per_sec = 0.166;
@@ -309,8 +312,24 @@ inline auto EzKatarina::ult_dmg(IGameObject * unit, int channel_time) -> float {
             (0.22 * g_LocalPlayer->AdditionalAttackDamage()) + (0.19 * g_LocalPlayer->FlatMagicDamageMod()));
     return dmg_per_dagger * (channel_time / dagger_per_sec); }
 
+inline auto EzKatarina::q_dmg(IGameObject * unit) -> float {
+    if(unit == nullptr || !unit->IsValidTarget() || !Spells["katarina.q"]->IsReady()) {
+        return 0; }
+
+    if(unit->Distance(g_LocalPlayer) > Spells["katarina.q"]->Range()) {
+        return 0; }
+
+    auto dmg = g_Common->CalculateDamageOnUnit(g_LocalPlayer, unit, DamageType::Magical,
+            std::vector<int> {75, 105, 135, 165, 195 } [Spells["katarina.q"]->Level() - 1] +
+            0.3 * g_LocalPlayer->FlatMagicDamageMod());
+
+    return dmg; }
+
 inline auto EzKatarina::e_dmg(IGameObject * unit) -> float {
-    if(unit == nullptr || !unit->IsValidTarget()) {
+    if(unit == nullptr || !unit->IsValidTarget() || !Spells["katarina.e"]->IsReady()) {
+        return 0; }
+
+    if(unit->Distance(g_LocalPlayer) > Spells["katarina.e"]->Range()) {
         return 0; }
 
     auto dmg = g_Common->CalculateDamageOnUnit(g_LocalPlayer, unit, DamageType::Magical,
@@ -319,4 +338,19 @@ inline auto EzKatarina::e_dmg(IGameObject * unit) -> float {
 
     return dmg; }
 
-inline auto EzKatarina::item_dmg(IGameObject * unit) -> float {}
+inline auto EzKatarina::gunblade_dmg(IGameObject * unit) -> float {
+    if(unit == nullptr || !unit->IsValidTarget()) {
+        return 0; }
+
+    if(unit->Distance(g_LocalPlayer) > 700) {
+        return 0; }
+
+    if(unit->HasItem(ItemId::Hextech_Gunblade)) {
+        if(unit->CanUseItem(ItemId::Hextech_Gunblade)) {
+            return 170.412
+                + (4.588 * g_LocalPlayer->Level())
+                + (0.3 * g_LocalPlayer->FlatMagicDamageMod()); }
+
+        return 0; }
+
+    return 0; }
