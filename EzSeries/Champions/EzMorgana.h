@@ -20,19 +20,19 @@ inline auto EzMorgana::on_boot(IMenu * menu) -> IMenu * {
     Menu["morgana.draw.e"] = d_menu->AddCheckBox("Draw Black Shield (E)", "morgana.draw.e", true);
     Menu["morgana.draw.r"] = d_menu->AddCheckBox("Draw Soul Shackles (R)", "morgana.draw.r", true);
 
-    auto s_menu = menu->AddSubMenu("Morgana: BlackShield", "morgana.shield");
-    auto um_menu = s_menu->AddSubMenu("Enabled Heroes", "enabled.champs");
+    //auto s_menu = menu->AddSubMenu("Morgana: BlackShield", "morgana.shield");
+    //auto um_menu = s_menu->AddSubMenu("Enabled Heroes", "enabled.champs");
 
-    for(auto i : g_ObjectManager->GetByType(EntityType::AIHeroClient)) {
-        if(i->IsAlly()) {
-            Menu[i->ChampionName().append("shield.enable")] = um_menu->AddCheckBox("Shield -> " + i->ChampionName(),
-                    i->ChampionName().append("shield.enable"), true); } }
+    //for(auto i : g_ObjectManager->GetByType(EntityType::AIHeroClient)) {
+    //    if(i->IsAlly()) {
+    //        Menu[i->ChampionName().append("shield.enable")] = um_menu->AddCheckBox("Shield -> " + i->ChampionName(),
+    //                i->ChampionName().append("shield.enable"), true); } }
 
-    Menu["morgana.use.e.mana"] = s_menu->AddSlider("Minimum Mana (%)", "morgana.use.e.mana", 55, 0, 100);
-    Menu["morgana.use.e.t"] = s_menu->AddCheckBox("Targeted Spells", "morgana.use.e.t", true);
-    Menu["morgana.use.e.s"] = s_menu->AddCheckBox("Line Spells", "morgana.use.e.s", true);
-    Menu["morgana.use.e.cs"] = s_menu->AddCheckBox("AoE Spells", "morgana.use.e.cs", true);
-    Menu["morgana.use.e.missile"] = s_menu->AddCheckBox("Missiles", "morgana.use.e.missile", true);
+    //Menu["morgana.use.e.mana"] = s_menu->AddSlider("Minimum Mana (%)", "morgana.use.e.mana", 55, 0, 100);
+    //Menu["morgana.use.e.t"] = s_menu->AddCheckBox("Targeted Spells", "morgana.use.e.t", true);
+    //Menu["morgana.use.e.s"] = s_menu->AddCheckBox("Line Spells", "morgana.use.e.s", true);
+    //Menu["morgana.use.e.cs"] = s_menu->AddCheckBox("AoE Spells", "morgana.use.e.cs", true);
+    //Menu["morgana.use.e.missile"] = s_menu->AddCheckBox("Missiles", "morgana.use.e.missile", true);
 
     Menu["morgana.use.q"] = menu->AddCheckBox("Use Dark Binding (Q)", "morgana.use.q", true);
     Menu["morgana.use.w"] = menu->AddCheckBox("Use Tormented Shadow (W)", "morgana.use.w", true);
@@ -73,6 +73,8 @@ inline void EzMorgana::on_draw() {
 
 
 inline void EzMorgana::on_create(IGameObject * obj) {
+    return; // soon tm
+
     if(obj != nullptr && obj->IsMissileClient() && Menu["morgana.use.e.missile"]->GetBool()) {
         if(!obj->IsValid() || obj->MissileSender() == nullptr) {
             return; }
@@ -90,11 +92,12 @@ inline void EzMorgana::on_create(IGameObject * obj) {
                             Spells["morgana.e"]->Cast(hero); } } } } } } }
 
 inline void EzMorgana::on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * args) {
+
     if(Menu["morgana.use.e.spell"] && unit->IsAIHero() && unit->IsEnemy()) {
         if(g_LocalPlayer->ManaPercent() < Menu["morgana.use.e.mana"]->GetInt()) {
             return; }
 
-        if(Spells["morgana.e"]->IsReady() && Menu["morgana.use.e"]->GetBool()) {
+        if(Spells["morgana.e"]->IsReady() && Menu["morgana.use.e"]->GetBool() && false) // soon.tm
             for(auto hero : g_ObjectManager->GetChampions()) {
                 if(hero->IsAlly() && Menu[hero->ChampionName().append("shield.enable")]->GetBool()) {
                     if(hero->IsValidTarget(Spells["morgana.e"]->Range(), false)) {
@@ -118,7 +121,7 @@ inline void EzMorgana::on_do_cast(IGameObject * unit, OnProcessSpellEventArgs * 
                             auto proj = hero->ServerPosition().ProjectOn(startPos, endPos);
 
                             if(proj.IsOnSegment && hero->Distance(proj.SegmentPoint) <= args->SpellData->LineWidth + hero->BoundingRadius()) {
-                                Spells["morgana.e"]->Cast(hero); } } } } } } }
+                                Spells["morgana.e"]->Cast(hero); } } } } } }
 
     if(unit->IsMe() && g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeCombo)) {
         if(Spells["morgana.q"]->IsReady() && Menu["morgana.use.q"]->GetBool() && Menu["morgana.use.fastw"]->GetBool()) {

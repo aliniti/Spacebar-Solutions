@@ -232,4 +232,6 @@ PLUGIN_API void OnUnloadSDK() {
     EventHandler<Events::OnProcessSpellCast>::RemoveEventHandler(on_cast_spell);
     EventHandler<Events::OnBeforeAttackOrbwalker>::RemoveEventHandler(on_before_attack);
     EventHandler<Events::OnDoCast>::RemoveEventHandler(on_do_cast);
-    config->Remove(); }
+
+    if(config != nullptr) {
+        config->Remove(); }; }
