@@ -17,6 +17,7 @@ class EzExtensions {
         static auto get_in_range(IGameObject * unit, float range, EntityType type, std::vector<IGameObject *> & units) -> int;
         static auto is_ready(std::shared_ptr<ISpell> spell, float time) -> bool;
         static auto get_prediction(std::shared_ptr<ISpell> spell, IGameObject * unit) -> IPredictionOutput;
+        static auto get_spell_name(std::shared_ptr<ISpell> spell);
         static auto get_mana(IGameObject * unit) -> ManaScenario;
         static auto get_combat_scenario(IGameObject * unit) -> ScenarioType;
         static auto get_prefered_hitchance(IGameObject * unit) -> HitChance;
@@ -69,6 +70,9 @@ inline auto EzExtensions::is_ready(std::shared_ptr<ISpell> spell, float time) ->
 inline auto EzExtensions::get_prediction(std::shared_ptr<ISpell> spell, IGameObject * unit) -> IPredictionOutput {
     return g_Common->GetPrediction(unit, spell->Range(), spell->Delay(), spell->Radius(), spell->Speed(), spell->CollisionFlags(),
             g_LocalPlayer->ServerPosition()); }
+
+inline auto EzExtensions::get_spell_name(std::shared_ptr<ISpell> spell) {
+    return g_LocalPlayer->GetSpellbook()->GetSpell(spell->Slot())->SData().SpellName; }
 
 inline auto EzExtensions::get_mana(IGameObject * unit) -> ManaScenario {
     auto manapct = unit->Mana() / unit->MaxMana() * 100;
@@ -238,18 +242,15 @@ inline auto EzExtensions::get_surrounding_positions(Vector v, float posRadius, i
 
     while(pos_checked < maxPosChecked) {
         radius_index++;
-
         const auto cur_radius = radius_index * (0x2 * posRadius);
         const auto cur_circle_checks = static_cast<int>(ceil((0x2 * M_PI * cur_radius) / (0x2 * static_cast<double>(posRadius))));
 
         for(auto i = 0x1; i < cur_circle_checks; i++) {
             pos_checked++;
-
             const auto c_radians = (0x2 * M_PI / (cur_circle_checks - 0x1)) * i;
             auto c_circle = Vector(
                     static_cast<float>(floor(v.x + cur_radius * cos(c_radians))),
                     static_cast<float>(floor(v.y + cur_radius * sin(c_radians)), v.z));
-
             possible_positions.push_back(c_circle); } }
 
     return possible_positions; }
