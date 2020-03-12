@@ -5,6 +5,7 @@
 #include "Champions/EzKatarina.h"
 #include "Champions/EzNeeko.h"
 #include "Champions/EzMorgana.h"
+#include "Champions/EzQiyana.h"
 
 // oh dis...
 PLUGIN_API const char PLUGIN_PRINT_NAME[32] = "EzSeries";

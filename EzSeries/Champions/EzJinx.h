@@ -286,6 +286,11 @@ inline void EzJinx::on_update() {
                         target->HasBuffOfType(BuffType::Flee)) {
                         Spells["jinx.e"]->FastCast(target->ServerPosition()); } } } } }
 
+    if(g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeFarm) || g_Orbwalker->IsModeActive(eOrbwalkingMode::kModeMixed)) {
+        if(g_LocalPlayer->HasBuff("jinxq") && g_LocalPlayer->CountEnemiesInRange(g_LocalPlayer->AttackRange()) < 1)
+            if(Spells["jinx.q"]->IsReady()) {
+                Spells["jinx.q"]->Cast(); } }
+
     handle_rockets();
     on_post_update(); }
 
